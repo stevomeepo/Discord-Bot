@@ -36,6 +36,14 @@ const queue = new Map();
 // Define the play function before it's used
 function play(guild, song) {
   const serverQueue = queue.get(guild.id);
+  if (!serverQueue) {
+    console.log('No server queue found for this guild.');
+    return;
+  }
+  if (!serverQueue.voiceChannel) {
+    console.log('No voice channel found in server queue.');
+    return;
+  }
   if (!song) {
     serverQueue.voiceChannel.leave();
     queue.delete(guild.id);

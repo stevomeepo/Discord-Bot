@@ -157,6 +157,7 @@ client.on('messageCreate', async message => {
     if (serverQueue && serverQueue.player && serverQueue.playing) {
       serverQueue.player.pause();
       message.channel.send('Paused the music.');
+      serverQueue.playing = false;
     } else {
       message.channel.send('No music is currently playing.');
     }
@@ -166,8 +167,8 @@ client.on('messageCreate', async message => {
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue && serverQueue.player && !serverQueue.playing) {
       serverQueue.player.unpause();
-      serverQueue.playing = true;
       message.channel.send('Resumed the music.');
+      serverQueue.playing = true;
     } else {
       message.channel.send('No music is currently paused.');
     }
@@ -178,8 +179,8 @@ client.on('messageCreate', async message => {
     if (serverQueue) {
       serverQueue.songs = []; // Clear queue
       serverQueue.player.stop();
-      serverQueue.playing = false;
       message.channel.send('Stopped the music and cleared the queue.');
+      serverQueue.playing = false;
     } else {
       message.channel.send('No music is currently playing.');
     }

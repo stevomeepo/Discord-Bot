@@ -148,6 +148,12 @@ client.on('messageCreate', async message => {
 
 function playSong(guild, song) {
   const serverQueue = queue.get(guild.id);
+
+  if (!serverQueue || !serverQueue.player) {
+    console.error('Server queue or player is not initialized.');
+    return;
+  }
+  
   if (!song) {
     serverQueue.connection.destroy();
     serverQueue.playing = false;

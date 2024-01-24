@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const YouTube = require('youtube-sr').default;
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
@@ -30,8 +31,6 @@ const client = new Client({
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
-
-let player;
 
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
@@ -62,7 +61,7 @@ client.on('messageCreate', async message => {
       try {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
-        player = createAudioPlayer();
+        const player = createAudioPlayer();
 
         const stream = ytdl(youtubeURL, { filter: 'audioonly' });
         const resource = createAudioResource(stream);
@@ -81,33 +80,6 @@ client.on('messageCreate', async message => {
       }
     } else {
       message.channel.send('You need to join a voice channel first!');
-    }
-  }
-
-  if (contentLower === '!pause') {
-    if (player) {
-      player.pause();
-      message.channel.send('Paused the music.');
-    } else {
-      message.channel.send('No music is currently playing.');
-    }
-  }
-
-  if (contentLower === '!resume') {
-    if (player) {
-      player.unpause();
-      message.channel.send('Resumed the music.');
-    } else {
-      message.channel.send('No music is currently paused.');
-    }
-  }
-
-  if (contentLower === '!stop') {
-    if (player) {
-      player.stop();
-      message.channel.send('Stopped the music.');
-    } else {
-      message.channel.send('No music is currently playing.');
     }
   }
 

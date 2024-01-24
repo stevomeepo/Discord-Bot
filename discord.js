@@ -33,6 +33,33 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+function playSong(guild, song) {
+  const serverQueue = queue.get(guild.id);
+
+  if (!serverQueue || !serverQueue.player) {
+    console.error('Server queue or player is not initialized.');
+    return;
+  }
+
+  if (!song) {
+    serverQueue.connection.destroy();
+    serverQueue.playing = false;
+    queue.delete(guild.id);
+    return;
+  }
+  const stream = ytdl(song.url, { filter: 'audioonly' });
+  const resource = createAudioResource(stream);
+  serverQueue.player.play(resource);
+  serverQueue.connection.subscribe(serverQueue.player);
+
+  serverQueue.player.on(AudioPlayerStatus.Idle, () => {
+    serverQueue.songs.shift();
+    playSong(guild, serverQueue.songs[0]);
+  });
+
+  serverQueue.player.on('error', error => console.error(`Error: ${error.message}`));
+}
+
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
 
@@ -158,33 +185,6 @@ client.on('messageCreate', async message => {
     }
   }
 
-function playSong(guild, song) {
-  const serverQueue = queue.get(guild.id);
-
-  if (!serverQueue || !serverQueue.player) {
-    console.error('Server queue or player is not initialized.');
-    return;
-  }
-
-  if (!song) {
-    serverQueue.connection.destroy();
-    serverQueue.playing = false;
-    queue.delete(guild.id);
-    return;
-  }
-  const stream = ytdl(song.url, { filter: 'audioonly' });
-  const resource = createAudioResource(stream);
-  serverQueue.player.play(resource);
-  serverQueue.connection.subscribe(serverQueue.player);
-
-  serverQueue.player.on(AudioPlayerStatus.Idle, () => {
-    serverQueue.songs.shift();
-    playSong(guild, serverQueue.songs[0]);
-  });
-
-  serverQueue.player.on('error', error => console.error(`Error: ${error.message}`));
-}
-
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
@@ -209,6 +209,7 @@ function playSong(guild, song) {
     message.channel.send("ayooo let me join");
   } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
     message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+  }
 }});
 
 client.login(process.env.DISCORD_TOKEN);

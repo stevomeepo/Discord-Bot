@@ -36,6 +36,7 @@ const queue = new Map();
 // Define the play function before it's used
 function play(guild, song) {
   const serverQueue = queue.get(guild.id);
+  console.log('Inside play, serverQueue:', serverQueue);
   if (!serverQueue) {
     console.log('No server queue found for this guild.');
     return;

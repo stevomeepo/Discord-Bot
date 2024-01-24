@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const YouTube = require('youtube-sr').default;
+const queue = new Map();
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
@@ -38,6 +39,13 @@ client.on('messageCreate', async message => {
   const contentLower = message.content.toLowerCase();
 
   if (contentLower.startsWith('!play')) {
+    const serverQueue = queue.get(message.guild.id) || {
+      songs: [],
+      connection: null,
+      player: createAudioPlayer(),
+      playing: false
+    };
+
     const args = message.content.split(' ').slice(1);
     if (args.length === 0) {
       message.channel.send('Please provide a YouTube URL or some keywords to search for.');
@@ -50,22 +58,28 @@ client.on('messageCreate', async message => {
       return;
     }
     const channel = message.guild.channels.cache.get(voiceChannelId);
-    const connection = joinVoiceChannel({
-      channelId: channel.id,
-      guildId: message.guild.id,
-      adapterCreator: message.guild.voiceAdapterCreator
-    });
+
+    if (!serverQueue.connection) {
+      serverQueue.connection = joinVoiceChannel({
+        channelId: channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator
+      });
+    }
 
     try {
-      await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
-      const player = createAudioPlayer();
+      await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
 
       let stream;
+      let song;
       if (ytdl.validateURL(args[0])) {
-        // If the first argument is a valid YouTube URL, use it directly
+        const videoInfo = await ytdl.getInfo(args[0]);
         stream = ytdl(args[0], { filter: 'audioonly' });
+        song = {
+          title: videoInfo.videoDetails.title,
+          url: args[0]
+        }
       } else {
-        // If the first argument is not a URL, treat it as search keywords
         const searchResults = await YouTube.search(args.join(' '), { limit: 1 });
         if (searchResults.length === 0) {
           message.channel.send('No results found for your query.');
@@ -73,26 +87,36 @@ client.on('messageCreate', async message => {
         }
         const videoUrl = searchResults[0].url;
         stream = ytdl(videoUrl, { filter: 'audioonly' });
+        song = {
+          title: searchResults[0].title,
+          url: videoUrl
+        }
       }
 
-      const resource = createAudioResource(stream);
-      player.play(resource);
-      connection.subscribe(player);
+      serverQueue.songs.push(song);
 
-      player.on(AudioPlayerStatus.Idle, () => connection.destroy());
-      player.on('error', error => console.error(`Error: ${error.message}`));
+      if (!serverQueue.playing) {
+        serverQueue.playing = true;
+        playSong(message.guild, serverQueue.songs[0]);
+      } else {
+        message.channel.send(`${song.title} has been added to the queue.`);
+      }
 
-      message.channel.send('Now playing your requested song!');
+      queue.set(message.guild.id, serverQueue);
     } catch (error) {
       console.error(error);
       message.channel.send('Failed to join your voice channel!');
-      connection.destroy();
+      if (serverQueue.connection) {
+        serverQueue.connection.destroy();
+      }
+      queue.delete(message.guild.id);
     }
   }
 
   if (contentLower === '!pause') {
-    if (player) {
-      player.pause();
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue && serverQueue.player && serverQueue.playing) {
+      serverQueue.player.pause();
       message.channel.send('Paused the music.');
     } else {
       message.channel.send('No music is currently playing.');
@@ -100,8 +124,10 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!resume') {
-    if (player) {
-      player.unpause();
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue && serverQueue.player && !serverQueue.playing) {
+      serverQueue.player.unpause();
+      serverQueue.playing = true;
       message.channel.send('Resumed the music.');
     } else {
       message.channel.send('No music is currently paused.');
@@ -109,13 +135,37 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!stop') {
-    if (player) {
-      player.stop();
-      message.channel.send('Stopped the music.');
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue) {
+      serverQueue.songs = []; // Clear queue
+      serverQueue.player.stop();
+      serverQueue.playing = false;
+      message.channel.send('Stopped the music and cleared the queue.');
     } else {
       message.channel.send('No music is currently playing.');
     }
   }
+
+function playSong(guild, song) {
+  const serverQueue = queue.get(guild.id);
+  if (!song) {
+    serverQueue.connection.destroy();
+    serverQueue.playing = false;
+    queue.delete(guild.id);
+    return;
+  }
+  const stream = ytdl(song.url, { filter: 'audioonly' });
+  const resource = createAudioResource(stream);
+  serverQueue.player.play(resource);
+  serverQueue.connection.subscribe(serverQueue.player);
+
+  serverQueue.player.on(AudioPlayerStatus.Idle, () => {
+    serverQueue.songs.shift();
+    playSong(guild, serverQueue.songs[0]);
+  });
+
+  serverQueue.player.on('error', error => console.error(`Error: ${error.message}`));
+}
 
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');

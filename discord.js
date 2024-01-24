@@ -31,8 +31,6 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-let player;
-
 const queue = new Map();
 
 // Define the play function before it's used
@@ -43,11 +41,11 @@ function play(guild, song) {
     queue.delete(guild.id);
     return;
   }
-  const stream = ytdl(song, { filter: 'audioonly' });
+  const stream = ytdl(song.url, { filter: 'audioonly' }); // Assuming song is an object with a url property
   const resource = createAudioResource(stream);
-  player.play(resource);
+  serverQueue.player.play(resource); // Use the player from the serverQueue
 
-  serverQueue.textChannel.send(`Now playing: ${song}`);
+  serverQueue.textChannel.send(`Now playing: ${song.title}`); // Assuming song is an object with a title property
 }
 
 // Define the skip function before it's used
@@ -85,15 +83,15 @@ client.on('messageCreate', async message => {
       return message.channel.send('Song added to the queue!');
     } else {
       const channel = message.guild.channels.cache.get(message.member.voice.channelId);
-      const queueContruct = {
+      const queueConstruct = {
         textChannel: message.channel,
         voiceChannel: channel,
         connection: null,
         songs: [],
         playing: true
       };
-      queue.set(message.guild.id, queueContruct);
-      queueContruct.songs.push(youtubeURL);
+      queue.set(message.guild.id, queueConstruct);
+      queueConstruct.songs.push(youtubeURL);
     }
 
     if (message.member.voice.channelId) {
@@ -107,19 +105,20 @@ client.on('messageCreate', async message => {
       try {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
-        player = createAudioPlayer();
-        connection.subscribe(player); // Subscribe the player to the connection here
+        const player = createAudioPlayer();
+        queueConstruct.player = player; // Store the player in the queueConstruct
+        connection.subscribe(player);
 
         player.on(AudioPlayerStatus.Idle, () => {
-          serverQueue.songs.shift();
-          play(message.guild, serverQueue.songs[0]);
+          queueConstruct.songs.shift();
+          play(message.guild, queueConstruct.songs[0]);
         });
         player.on('error', error => console.error(`Error: ${error.message}`));
 
         message.channel.send('Now playing your requested song!');
 
-        queueContruct.connection = connection;
-        play(message.guild, queueContruct.songs[0]);
+        queueConstruct.connection = connection;
+        play(message.guild, queueConstruct.songs[0]);
       } catch (error) {
         console.error(error);
         message.channel.send('Failed to join your voice channel!');
@@ -137,8 +136,9 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!pause') {
-    if (player) {
-      player.pause();
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue && serverQueue.player) {
+      serverQueue.player.pause();
       message.channel.send('Paused the music.');
     } else {
       message.channel.send('No music is currently playing.');
@@ -146,8 +146,9 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!resume') {
-    if (player) {
-      player.unpause();
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue && serverQueue.player) {
+      serverQueue.player.unpause();
       message.channel.send('Resumed the music.');
     } else {
       message.channel.send('No music is currently paused.');
@@ -155,8 +156,11 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!stop') {
-    if (player) {
-      player.stop();
+    const serverQueue = queue.get(message.guild.id);
+    if (serverQueue && serverQueue.player) {
+      serverQueue.player.stop();
+      serverQueue.voiceChannel.leave();
+      queue.delete(message.guild.id);
       message.channel.send('Stopped the music.');
     } else {
       message.channel.send('No music is currently playing.');

@@ -39,12 +39,24 @@ client.on('messageCreate', async message => {
   const contentLower = message.content.toLowerCase();
 
   if (contentLower.startsWith('!play')) {
-    const serverQueue = queue.get(message.guild.id) || {
-      songs: [],
-      connection: null,
-      player: createAudioPlayer(),
-      playing: false
-    };
+    let serverQueue = queue.get(message.guild.id) 
+    
+    if (!serverQueue) {
+      serverQueue= {
+        songs: [],
+        connection: null,
+        player: createAudioPlayer(),
+        playing: false
+      }
+      queue.set(message.guild.id, serverQueue);
+
+      serverQueue.player.on(AudioPlayerStatus.Idle, () => {
+        serverQueue.songs.shift();
+        playSong(message.guild, serverQueue.songs[0]);
+
+    });
+    
+    serverQueue.player.on('error', error => console.error(`Error: ${error.message}`));
 
     const args = message.content.split(' ').slice(1);
     if (args.length === 0) {
@@ -153,7 +165,7 @@ function playSong(guild, song) {
     console.error('Server queue or player is not initialized.');
     return;
   }
-  
+
   if (!song) {
     serverQueue.connection.destroy();
     serverQueue.playing = false;

@@ -40,8 +40,10 @@ function play(guild, song) {
     console.log('No server queue found for this guild.');
     return;
   }
-  if (!serverQueue.voiceChannel) {
-    console.log('No voice channel found in server queue.');
+  // Check if the voiceChannel is a proper VoiceChannel object
+  if (!serverQueue.voiceChannel || typeof serverQueue.voiceChannel.leave !== 'function') {
+    console.log('The voice channel is not properly set in the server queue.');
+    queue.delete(guild.id);
     return;
   }
   if (!song) {
@@ -91,6 +93,7 @@ client.on('messageCreate', async message => {
       return message.channel.send('Song added to the queue!');
     } else {
       const channel = message.guild.channels.cache.get(message.member.voice.channelId);
+      if (!channel) return message.channel.send('You need to join a voice channel first!');
       serverQueue = {
         textChannel: message.channel,
         voiceChannel: channel,

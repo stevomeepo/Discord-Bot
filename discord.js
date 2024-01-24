@@ -11,6 +11,7 @@ const lolRegex = /l+o+l+/;
 const lmaoRegex = /l+m+a+o+/;
 const mattRegex = /m+a+t+t+/;
 const poopRegex = /p+o+o+p/;
+const danceRegex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
 
 // Create a new client instance with the specified intents
 const client = new Client({
@@ -53,6 +54,8 @@ client.on('messageCreate', message => {
     message.channel.send("Matt is my boss");
   } else if (poopRegex.test(contentLower)) {
     message.channel.send("ayooo let me join");
+  } else if (danceRegex.test(contentLower)) {
+    message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
 }});
 
 client.login(process.env.DISCORD_TOKEN);

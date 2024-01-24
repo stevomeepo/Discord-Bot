@@ -38,48 +38,82 @@ client.on('messageCreate', async message => {
   const contentLower = message.content.toLowerCase();
 
   if (contentLower.startsWith('!play')) {
-    const args = message.content.split(' ');
-    if (args.length < 2) {
-      message.channel.send('Please provide a YouTube URL.');
+    const args = message.content.split(' ').slice(1);
+    if (args.length === 0) {
+      message.channel.send('Please provide a YouTube URL or some keywords to search for.');
       return;
     }
-    const youtubeURL = args[1];
-    if (!ytdl.validateURL(youtubeURL)) {
-      message.channel.send('Please provide a valid YouTube URL.');
-      return;
-    }
-    console.log("User's voice channel ID:", message.member.voice.channelId);
 
-    if (message.member.voice.channelId) {
-      const channel = message.guild.channels.cache.get(message.member.voice.channelId);
-      const connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: message.guild.id,
-        adapterCreator: message.guild.voiceAdapterCreator,
-      });
-
-      try {
-        await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
-
-        const player = createAudioPlayer();
-
-        const stream = ytdl(youtubeURL, { filter: 'audioonly' });
-        const resource = createAudioResource(stream);
-
-        player.play(resource);
-        connection.subscribe(player);
-
-        player.on(AudioPlayerStatus.Idle, () => connection.destroy());
-        player.on('error', error => console.error(`Error: ${error.message}`));
-
-        message.channel.send('Now playing your requested song!');
-      } catch (error) {
-        console.error(error);
-        message.channel.send('Failed to join your voice channel!');
-        connection.destroy();
-      }
-    } else {
+    const voiceChannelId = message.member.voice.channelId;
+    if (!voiceChannelId) {
       message.channel.send('You need to join a voice channel first!');
+      return;
+    }
+    const channel = message.guild.channels.cache.get(voiceChannelId);
+    const connection = joinVoiceChannel({
+      channelId: channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator
+    });
+
+    try {
+      await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
+      const player = createAudioPlayer();
+
+      let stream;
+      if (ytdl.validateURL(args[0])) {
+        // If the first argument is a valid YouTube URL, use it directly
+        stream = ytdl(args[0], { filter: 'audioonly' });
+      } else {
+        // If the first argument is not a URL, treat it as search keywords
+        const searchResults = await YouTube.search(args.join(' '), { limit: 1 });
+        if (searchResults.length === 0) {
+          message.channel.send('No results found for your query.');
+          return;
+        }
+        const videoUrl = searchResults[0].url;
+        stream = ytdl(videoUrl, { filter: 'audioonly' });
+      }
+
+      const resource = createAudioResource(stream);
+      player.play(resource);
+      connection.subscribe(player);
+
+      player.on(AudioPlayerStatus.Idle, () => connection.destroy());
+      player.on('error', error => console.error(`Error: ${error.message}`));
+
+      message.channel.send('Now playing your requested song!');
+    } catch (error) {
+      console.error(error);
+      message.channel.send('Failed to join your voice channel!');
+      connection.destroy();
+    }
+  }
+
+  if (contentLower === '!pause') {
+    if (player) {
+      player.pause();
+      message.channel.send('Paused the music.');
+    } else {
+      message.channel.send('No music is currently playing.');
+    }
+  }
+
+  if (contentLower === '!resume') {
+    if (player) {
+      player.unpause();
+      message.channel.send('Resumed the music.');
+    } else {
+      message.channel.send('No music is currently paused.');
+    }
+  }
+
+  if (contentLower === '!stop') {
+    if (player) {
+      player.stop();
+      message.channel.send('Stopped the music.');
+    } else {
+      message.channel.send('No music is currently playing.');
     }
   }
 

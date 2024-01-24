@@ -21,7 +21,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent // Required to read message content
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildVoiceStates
   ]
 });
 
@@ -46,10 +47,12 @@ client.on('messageCreate', async message => {
       message.channel.send('Please provide a valid YouTube URL.');
       return;
     }
+    console.log("User's voice channel ID:", message.member.voice.channelId);
 
-    if (message.member.voice.channel) {
+    if (message.member.voice.channelId) {
+      const channel = message.guild.channels.cache.get(message.member.voice.channelId);
       const connection = joinVoiceChannel({
-        channelId: message.member.voice.channel.id,
+        channelId: channel.id,
         guildId: message.guild.id,
         adapterCreator: message.guild.voiceAdapterCreator,
       });

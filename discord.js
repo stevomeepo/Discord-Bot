@@ -42,7 +42,6 @@ function play(guild, song) {
     return;
   }
   if (!song) {
-    serverQueue.voiceChannel.leave();
     queue.delete(guild.id);
     return;
   }
@@ -171,7 +170,6 @@ client.on('messageCreate', async message => {
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue && serverQueue.player) {
       serverQueue.player.stop();
-      serverQueue.voiceChannel.leave();
       queue.delete(message.guild.id);
       message.channel.send('Stopped the music.');
     } else {

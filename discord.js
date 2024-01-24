@@ -39,7 +39,7 @@ client.on('messageCreate', message => {
   } else if (tickleRegex.test(contentLower)) {
     message.channel.send("It's tickle tuesday!");
   } else if (downRegex.test(contentLower)) {
-    message.channel.send("I'm acutally DOWNS'");
+    message.channel.send("I'm acutally DOWNS");
 }});
 
 client.login(process.env.DISCORD_TOKEN);

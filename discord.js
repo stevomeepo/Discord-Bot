@@ -22,7 +22,8 @@ client.on('messageCreate', message => {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night')) {
     message.channel.send('Good night bogas!');
-  }
+  } else if (message.content.toLowerCase().includes('cook')) {
+    message.channel.send("IT'S TIME TO COOK! @everyone");
 });
 
 client.login(process.env.DISCORD_TOKEN);

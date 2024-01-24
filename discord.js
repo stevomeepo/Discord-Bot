@@ -31,6 +31,8 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+let player;
+
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
 
@@ -60,7 +62,7 @@ client.on('messageCreate', async message => {
       try {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
-        const player = createAudioPlayer();
+        player = createAudioPlayer();
 
         const stream = ytdl(youtubeURL, { filter: 'audioonly' });
         const resource = createAudioResource(stream);
@@ -79,6 +81,33 @@ client.on('messageCreate', async message => {
       }
     } else {
       message.channel.send('You need to join a voice channel first!');
+    }
+  }
+
+  if (contentLower === '!pause') {
+    if (player) {
+      player.pause();
+      message.channel.send('Paused the music.');
+    } else {
+      message.channel.send('No music is currently playing.');
+    }
+  }
+
+  if (contentLower === '!resume') {
+    if (player) {
+      player.unpause();
+      message.channel.send('Resumed the music.');
+    } else {
+      message.channel.send('No music is currently paused.');
+    }
+  }
+
+  if (contentLower === '!stop') {
+    if (player) {
+      player.stop();
+      message.channel.send('Stopped the music.');
+    } else {
+      message.channel.send('No music is currently playing.');
     }
   }
 

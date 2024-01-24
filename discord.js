@@ -23,7 +23,7 @@ client.on('messageCreate', message => {
   } else if (message.content.toLowerCase().includes('good night')) {
     message.channel.send('Good night bogas!');
   } else if (message.content.toLowerCase().includes('cook')) {
-    message.channel.send('Good night bogas!');
+    message.channel.send("IT'S TIME TO COOK! @everyone");
   }
 });
 

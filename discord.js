@@ -6,6 +6,8 @@ const goofyRegex = /g+o+o+f+y+/;
 const dummyRegex = /d+u+m+b+/;
 const tickleRegex = /t+i+c+k+l+e+/;
 const downRegex = /d+o+w+n+/;
+const lolRegex = /l+o+l+/;
+const lmaoRegex = /l+m+a+o+/
 
 // Create a new client instance with the specified intents
 const client = new Client({
@@ -40,6 +42,10 @@ client.on('messageCreate', message => {
     message.channel.send("It's tickle tuesday!");
   } else if (downRegex.test(contentLower)) {
     message.channel.send("I'm acutally DOWNS");
+  } else if (lolRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
+  } else if (lmaoRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
 }});
 
 client.login(process.env.DISCORD_TOKEN);

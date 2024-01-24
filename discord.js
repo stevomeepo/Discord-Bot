@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
@@ -28,10 +30,54 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
   if (message.author.bot) return;
 
   const contentLower = message.content.toLowerCase();
+
+  if (contentLower.startsWith('!play')) {
+    const args = message.content.split(' ');
+    if (args.length < 2) {
+      message.channel.send('Please provide a YouTube URL.');
+      return;
+    }
+    const youtubeURL = args[1];
+    if (!ytdl.validateURL(youtubeURL)) {
+      message.channel.send('Please provide a valid YouTube URL.');
+      return;
+    }
+
+    if (message.member.voice.channel) {
+      const connection = joinVoiceChannel({
+        channelId: message.member.voice.channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator,
+      });
+
+      try {
+        await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
+
+        const player = createAudioPlayer();
+
+        const stream = ytdl(youtubeURL, { filter: 'audioonly' });
+        const resource = createAudioResource(stream);
+
+        player.play(resource);
+        connection.subscribe(player);
+
+        player.on(AudioPlayerStatus.Idle, () => connection.destroy());
+        player.on('error', error => console.error(`Error: ${error.message}`));
+
+        message.channel.send('Now playing your requested song!');
+      } catch (error) {
+        console.error(error);
+        message.channel.send('Failed to join your voice channel!');
+        connection.destroy();
+      }
+    } else {
+      message.channel.send('You need to join a voice channel first!');
+    }
+  }
 
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');

@@ -7,8 +7,9 @@ const dummyRegex = /d+u+m+b+/;
 const tickleRegex = /t+i+c+k+l+e+/;
 const downRegex = /d+o+w+n+/;
 const lolRegex = /l+o+l+/;
-const lmaoRegex = /l+m+a+o+/
-const mattRegex = /m+a+t+t+/
+const lmaoRegex = /l+m+a+o+/;
+const mattRegex = /m+a+t+t+/;
+const poopRegex = /p+o+o+p/;
 
 // Create a new client instance with the specified intents
 const client = new Client({
@@ -49,6 +50,8 @@ client.on('messageCreate', message => {
     message.channel.send("stop making me laugh so hard teehee");
   } else if (mattRegex.test(contentLower)) {
     message.channel.send("Matt is my boss");
+  } else if (poopRegex.test(contentLower)) {
+    message.channel.send("ayooo let me join");
 }});
 
 client.login(process.env.DISCORD_TOKEN);

@@ -74,6 +74,10 @@ client.on('messageCreate', async message => {
   const contentLower = message.content.toLowerCase();
 
   if (contentLower.startsWith('!play')) {
+    if (!message.member.voice.channelId) {
+      return message.channel.send('You need to join a voice channel first!');
+    }
+    console.log("User's voice channel ID:", message.member.voice.channelId);
     const args = message.content.split(' ');
     if (args.length < 2) {
       message.channel.send('Please provide a YouTube URL.');
@@ -94,6 +98,8 @@ client.on('messageCreate', async message => {
     } else {
       const channel = message.guild.channels.cache.get(message.member.voice.channelId);
       if (!channel) return message.channel.send('You need to join a voice channel first!');
+      console.log('Joining voice channel:', channel.id);
+      
       serverQueue = {
         textChannel: message.channel,
         voiceChannel: channel,

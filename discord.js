@@ -21,6 +21,8 @@ client.on('ready', () => {
 client.on('messageCreate', message => {
   if (message.author.bot) return;
 
+  const contentLower = message.content.toLowerCase();
+
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night')) {

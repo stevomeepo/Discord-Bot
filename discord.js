@@ -153,6 +153,7 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!pause') {
+    console.log('Pause command received');
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue && serverQueue.player && serverQueue.playing) {
       serverQueue.player.pause();
@@ -164,6 +165,7 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!resume') {
+    console.log('Resume command received');
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue && serverQueue.player && !serverQueue.playing) {
       serverQueue.player.unpause();
@@ -175,6 +177,7 @@ client.on('messageCreate', async message => {
   }
 
   if (contentLower === '!stop') {
+    console.log('Stop command received');
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue) {
       serverQueue.songs = []; // Clear queue

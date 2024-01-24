@@ -33,6 +33,33 @@ client.on('ready', () => {
 
 let player;
 
+const queue = new Map();
+
+// Define the play function before it's used
+function play(guild, song) {
+  const serverQueue = queue.get(guild.id);
+  if (!song) {
+    serverQueue.voiceChannel.leave();
+    queue.delete(guild.id);
+    return;
+  }
+  const stream = ytdl(song, { filter: 'audioonly' });
+  const resource = createAudioResource(stream);
+  player.play(resource);
+
+  serverQueue.textChannel.send(`Now playing: ${song}`);
+}
+
+// Define the skip function before it's used
+function skip(message, serverQueue) {
+  if (!message.member.voice.channel)
+    return message.channel.send('You have to be in a voice channel to skip the music!');
+  if (!serverQueue)
+    return message.channel.send('There is no song that I could skip!');
+  serverQueue.songs.shift();
+  play(message.guild, serverQueue.songs[0]);
+}
+
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
 
@@ -51,6 +78,24 @@ client.on('messageCreate', async message => {
     }
     console.log("User's voice channel ID:", message.member.voice.channelId);
 
+    const serverQueue = queue.get(message.guild.id);
+
+    if (serverQueue) {
+      serverQueue.songs.push(youtubeURL);
+      return message.channel.send('Song added to the queue!');
+    } else {
+      const channel = message.guild.channels.cache.get(message.member.voice.channelId);
+      const queueContruct = {
+        textChannel: message.channel,
+        voiceChannel: channel,
+        connection: null,
+        songs: [],
+        playing: true
+      };
+      queue.set(message.guild.id, queueContruct);
+      queueContruct.songs.push(youtubeURL);
+    }
+
     if (message.member.voice.channelId) {
       const channel = message.guild.channels.cache.get(message.member.voice.channelId);
       const connection = joinVoiceChannel({
@@ -63,25 +108,32 @@ client.on('messageCreate', async message => {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
         player = createAudioPlayer();
+        connection.subscribe(player); // Subscribe the player to the connection here
 
-        const stream = ytdl(youtubeURL, { filter: 'audioonly' });
-        const resource = createAudioResource(stream);
-
-        player.play(resource);
-        connection.subscribe(player);
-
-        player.on(AudioPlayerStatus.Idle, () => connection.destroy());
+        player.on(AudioPlayerStatus.Idle, () => {
+          serverQueue.songs.shift();
+          play(message.guild, serverQueue.songs[0]);
+        });
         player.on('error', error => console.error(`Error: ${error.message}`));
 
         message.channel.send('Now playing your requested song!');
+
+        queueContruct.connection = connection;
+        play(message.guild, queueContruct.songs[0]);
       } catch (error) {
         console.error(error);
         message.channel.send('Failed to join your voice channel!');
         connection.destroy();
+        queue.delete(message.guild.id);
       }
     } else {
       message.channel.send('You need to join a voice channel first!');
     }
+  }
+
+  if (contentLower === '!skip') {
+    skip(message, serverQueue);
+    return;
   }
 
   if (contentLower === '!pause') {

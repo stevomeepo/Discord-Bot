@@ -37,6 +37,6 @@ client.on('messageCreate', message => {
     message.channel.send('thats me hehe XD');
   } else if (tickleRegex.test(contentLower)) {
     message.channel.send("It's tickle tuesday!");
-});
+}});
 
 client.login(process.env.DISCORD_TOKEN);

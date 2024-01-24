@@ -1,5 +1,8 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
+const cookRegex = /c+o+o+k+/;
+const bogaRegex = /b+o+g+a+/;
+const goofyRegex = /g+o+o+f+y+/;
 
 // Create a new client instance with the specified intents
 const client = new Client({
@@ -18,12 +21,14 @@ client.on('ready', () => {
 client.on('messageCreate', message => {
   if (message.author.bot) return;
 
-  if (message.content.toLowerCase().includes('boga')) {
+  if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night')) {
     message.channel.send('Good night bogas!');
-  } else if (message.content.toLowerCase().includes('cook')) {
+  } else if (cookRegex.test(contentLower)) {
     message.channel.send("IT'S TIME TO COOK! @everyone");
+  } else if (goofyRegex.test(contentLower)) {
+    message.channel.send('Imma goofy goober!');
   }
 });
 

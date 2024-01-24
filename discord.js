@@ -76,22 +76,22 @@ client.on('messageCreate', async message => {
     }
     console.log("User's voice channel ID:", message.member.voice.channelId);
 
-    const serverQueue = queue.get(message.guild.id);
+    let serverQueue = queue.get(message.guild.id);
 
     if (serverQueue) {
       serverQueue.songs.push(youtubeURL);
       return message.channel.send('Song added to the queue!');
     } else {
       const channel = message.guild.channels.cache.get(message.member.voice.channelId);
-      const queueConstruct = {
+      serverQueue = {
         textChannel: message.channel,
         voiceChannel: channel,
         connection: null,
         songs: [],
         playing: true
       };
-      queue.set(message.guild.id, queueConstruct);
-      queueConstruct.songs.push(youtubeURL);
+      queue.set(message.guild.id, serverQueue);
+      serverQueue.songs.push(youtubeURL);
     }
 
     if (message.member.voice.channelId) {
@@ -106,19 +106,19 @@ client.on('messageCreate', async message => {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
 
         const player = createAudioPlayer();
-        queueConstruct.player = player; // Store the player in the queueConstruct
+        serverQueue.player = player; // Store the player in the queueConstruct
         connection.subscribe(player);
 
         player.on(AudioPlayerStatus.Idle, () => {
-          queueConstruct.songs.shift();
-          play(message.guild, queueConstruct.songs[0]);
+          serverQueue.songs.shift();
+          play(message.guild, serverQueue.songs[0]);
         });
         player.on('error', error => console.error(`Error: ${error.message}`));
 
         message.channel.send('Now playing your requested song!');
 
-        queueConstruct.connection = connection;
-        play(message.guild, queueConstruct.songs[0]);
+        serverQueue.connection = connection;
+        play(message.guild, serverQueue.songs[0]);
       } catch (error) {
         console.error(error);
         message.channel.send('Failed to join your voice channel!');

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const cookRegex = /c+o+o+k+/;
+const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
 const goofyRegex = /g+o+o+f+y+/;
 const dummyRegex = /d+u+m+b+/;
@@ -34,7 +35,7 @@ client.on('messageCreate', message => {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
     message.channel.send('Good night bogas!');
-  } else if (cookRegex.test(contentLower)) {
+  } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
     message.channel.send("IT'S TIME TO COOK! @everyone");
   } else if (goofyRegex.test(contentLower)) {
     message.channel.send('Imma goofy goober!');

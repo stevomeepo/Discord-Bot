@@ -41,22 +41,16 @@ function play(guild, song) {
     console.log('No server queue found for this guild.');
     return;
   }
-  // Check if the voiceChannel is a proper VoiceChannel object
-  if (!serverQueue.voiceChannel || typeof serverQueue.voiceChannel.leave !== 'function') {
-    console.log('The voice channel is not properly set in the server queue.');
-    queue.delete(guild.id);
-    return;
-  }
   if (!song) {
     serverQueue.voiceChannel.leave();
     queue.delete(guild.id);
     return;
   }
-  const stream = ytdl(song.url, { filter: 'audioonly' }); // Assuming song is an object with a url property
+  const stream = ytdl(song.url, { filter: 'audioonly' });
   const resource = createAudioResource(stream);
-  serverQueue.player.play(resource); // Use the player from the serverQueue
+  serverQueue.player.play(resource);
 
-  serverQueue.textChannel.send(`Now playing: ${song.title}`); // Assuming song is an object with a title property
+  serverQueue.textChannel.send(`Now playing: ${song.title}`);
 }
 
 // Define the skip function before it's used

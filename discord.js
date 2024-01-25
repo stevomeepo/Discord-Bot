@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const queues = new Map();
+const inactivityTimeouts = new Map();
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
@@ -77,6 +78,12 @@ client.on('messageCreate', async message => {
       }
     } else {
       serverQueue.songs.push(youtubeURL);
+
+      const timeout = inactivityTimeouts.get(message.guild.id);
+      if (timeout) {
+        clearTimeout(timeout);
+        inactivityTimeouts.delete(message.guild.id);
+      }
       message.channel.send(`Added to queue: ${youtubeURL}`);
     }
   } else if (contentLower === '!stop') {
@@ -148,11 +155,30 @@ client.on('messageCreate', async message => {
 
 function play(guild, song) {
   const serverQueue = queues.get(guild.id);
+  if (!serverQueue) {
+    console.log('No server queue found.');
+    return;
+  }
+
+  // Clear the existing inactivity timeout if there is one
+  const timeout = inactivityTimeouts.get(guild.id);
+  if (timeout) {
+    clearTimeout(timeout);
+    inactivityTimeouts.delete(guild.id);
+  }
+
   if (!song) {
     if (serverQueue.connection) {
-      serverQueue.connection.destroy();
+      // Set a timeout to leave the channel after 5 minutes of inactivity
+      const inactivityTimeout = setTimeout(() => {
+        serverQueue.connection.destroy();
+        queues.delete(guild.id);
+        inactivityTimeouts.delete(guild.id);
+        console.log(`Left the voice channel in ${guild.name} due to inactivity.`);
+      }, 300000); // 5 minutes in milliseconds
+
+      inactivityTimeouts.set(guild.id, inactivityTimeout);
     }
-    queues.delete(guild.id);
     return;
   }
 
@@ -168,6 +194,16 @@ function play(guild, song) {
 
   serverQueue.player.on(AudioPlayerStatus.Idle, () => {
     serverQueue.songs.shift(); // Remove the finished song from the queue
+    // Set a timeout to leave the channel after 5 minutes of inactivity
+    const inactivityTimeout = setTimeout(() => {
+      if (serverQueue.connection) {
+        serverQueue.connection.destroy();
+        queues.delete(guild.id);
+        console.log(`Left the voice channel in ${guild.name} due to inactivity.`);
+      }
+    }, 300000); // 5 minutes in milliseconds
+    inactivityTimeouts.set(guild.id, inactivityTimeout);
+
     play(guild, serverQueue.songs[0]); // Play the next song
   });
 
@@ -179,5 +215,4 @@ function play(guild, song) {
 
   serverQueue.textChannel.send(`Now playing: ${song}`);
 }
-
 client.login(process.env.DISCORD_TOKEN);

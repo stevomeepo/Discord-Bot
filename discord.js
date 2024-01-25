@@ -153,7 +153,8 @@ client.on('messageCreate', async message => {
     message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
   } else if (commandRegex.test(contentLower)) {
     message.channel.send(`\`\`\`
-    Hello. Boga AI here to play some music for you. Here are the functions for using Boga Music Player.
+    Hello. Boga AI here to play some music for you.
+    Here are the functions for using Boga Music Player.
     
     Please use the "Boga Music" voice channel to listen to music
     

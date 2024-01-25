@@ -100,6 +100,24 @@ client.on('messageCreate', async message => {
     }
   }
 
+  if (contentLower === '!skip') {
+    if (serverQueue && serverQueue.songs.length > 0) {
+      serverQueue.songs.shift(); // Skip the current song
+      if (serverQueue.songs.length > 0) {
+        play(message.guild, serverQueue.songs[0]); // Play the next song
+        message.channel.send('Skipped the song and playing the next one.');
+      } else {
+        if (serverQueue.connection) {
+          serverQueue.connection.destroy();
+        }
+        queues.delete(message.guild.id);
+        message.channel.send('Skipped the song. The queue is now empty.');
+      }
+    } else {
+      message.channel.send('There is no song to skip.');
+    }
+  }
+
   // The following conditions should be inside the messageCreate event listener
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
@@ -141,6 +159,8 @@ function play(guild, song) {
   if (!serverQueue.player) {
     serverQueue.player = createAudioPlayer();
     serverQueue.connection.subscribe(serverQueue.player);
+  } else {
+    serverQueue.player.stop();
   }
   serverQueue.player.play(resource);
 
@@ -149,7 +169,12 @@ function play(guild, song) {
     play(guild, serverQueue.songs[0]); // Play the next song
   });
 
-  serverQueue.player.on('error', error => console.error(`Error: ${error.message}`));
+  serverQueue.player.on('error', error => {
+    console.error(`Error: ${error.message}`);
+    serverQueue.songs.shift();
+    play(guild, serverQueue.songs[0]);
+  });
+
   serverQueue.textChannel.send(`Now playing: ${song}`);
 }
 

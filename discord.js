@@ -149,7 +149,9 @@ client.on('messageCreate', async message => {
 function play(guild, song) {
   const serverQueue = queues.get(guild.id);
   if (!song) {
-    serverQueue.voiceChannel.leave();
+    if (serverQueue.connection) {
+      serverQueue.connection.destroy();
+    }
     queues.delete(guild.id);
     return;
   }

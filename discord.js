@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const youtubeSearch = require('youtube-search');
 const queues = new Map();
 const inactivityTimeouts = new Map();
 const cookRegex = /c+o+o+k+/;
@@ -42,50 +43,75 @@ client.on('messageCreate', async message => {
   if (contentLower.startsWith('!play')) {
     const args = message.content.split(' ');
     if (args.length < 2) {
-      message.channel.send('Please provide a YouTube URL.');
+      message.channel.send('Please provide a YouTube URL or search keywords.');
       return;
     }
-    const youtubeURL = args[1];
-    if (!ytdl.validateURL(youtubeURL)) {
-      message.channel.send('Please provide a valid YouTube URL.');
-      return;
-    }
+    const searchTerm = args.slice(1).join(' ');
 
-    if (!serverQueue) {
-      // Create a queue since one doesn't exist
-      const queue = {
-        textChannel: message.channel,
-        voiceChannel: message.member.voice.channel,
-        connection: null,
-        songs: [],
-        volume: 5,
-        playing: true,
-      };
-      queues.set(message.guild.id, queue);
-      queue.songs.push(youtubeURL);
-
-      try {
-        const connection = joinVoiceChannel({
-          channelId: message.member.voice.channelId,
-          guildId: message.guild.id,
-          adapterCreator: message.guild.voiceAdapterCreator,
-        });
-        queue.connection = connection;
-        play(message.guild, queue.songs[0]);
-      } catch (err) {
-        console.error(err);
-        queues.delete(message.guild.id);
-        message.channel.send('Failed to join the voice channel.');
+    // Function to handle playing a song
+    const playSong = async (url) => {
+      if (!ytdl.validateURL(url)) {
+        message.channel.send('Please provide a valid YouTube URL.');
+        return;
       }
+
+      if (!serverQueue) {
+        const queue = {
+          textChannel: message.channel,
+          voiceChannel: message.member.voice.channel,
+          connection: null,
+          songs: [],
+          volume: 5,
+          playing: true,
+        };
+        queues.set(message.guild.id, queue);
+        queue.songs.push(url);
+
+        try {
+          const connection = joinVoiceChannel({
+            channelId: message.member.voice.channelId,
+            guildId: message.guild.id,
+            adapterCreator: message.guild.voiceAdapterCreator,
+          });
+          queue.connection = connection;
+          play(message.guild, queue.songs[0]);
+        } catch (err) {
+          console.error(err);
+          queues.delete(message.guild.id);
+          message.channel.send('Failed to join the voice channel.');
+        }
+      } else {
+        serverQueue.songs.push(url);
+
+        const timeout = inactivityTimeouts.get(message.guild.id);
+        if (timeout) {
+          clearTimeout(timeout);
+          inactivityTimeouts.delete(message.guild.id);
+        }
+        message.channel.send(`Added to queue: ${url}`);
+      }
+    };
+
+    if (ytdl.validateURL(searchTerm)) {
+      // It's a valid URL, play as normal
+      playSong(searchTerm);
     } else {
-      serverQueue.songs.push(youtubeURL);
+      // It's a search term, search for the video
+      const opts = {
+        maxResults: 1,
+        key: process.env.YOUTUBE_API_KEY
+      };
 
-      const timeout = inactivityTimeouts.get(message.guild.id);
-      if (timeout) {
-        clearTimeout(timeout);
-        inactivityTimeouts.delete(message.guild.id);
-      }
-      message.channel.send(`Added to queue: ${youtubeURL}`);
+      youtubeSearch(searchTerm, opts, (err, results) => {
+        if(err) return console.log(err);
+
+        if(results && results.length > 0) {
+          const foundVideo = results[0];
+          playSong(foundVideo.link);
+        } else {
+          message.channel.send('No results found for your query.');
+        }
+      });
     }
   } else if (contentLower === '!stop') {
     if (serverQueue) {
@@ -126,7 +152,6 @@ client.on('messageCreate', async message => {
     }
   }
 
-  // The following conditions should be inside the messageCreate event listener
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {

@@ -244,6 +244,11 @@ function play(guild, song) {
     inactivityTimeouts.set(guild.id, inactivityTimeout);
 
     play(guild, serverQueue.songs[0]); // Play the next song
+    
+  });
+
+  serverQueue.player.on('debug', (message) => {
+    console.log(message);
   });
 
   serverQueue.player.on('error', error => {
@@ -255,3 +260,4 @@ function play(guild, song) {
   serverQueue.textChannel.send(`Now playing: ${song}`);
 }
 client.login(process.env.DISCORD_TOKEN);
+

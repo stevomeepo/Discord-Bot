@@ -99,6 +99,33 @@ client.on('messageCreate', async message => {
       message.channel.send('Resumed the music.');
     }
   }
+
+  // The following conditions should be inside the messageCreate event listener
+  if (bogaRegex.test(contentLower)) {
+    message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
+  } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
+    message.channel.send('Good night bogas!');
+  } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
+    message.channel.send("IT'S TIME TO COOK! @everyone");
+  } else if (goofyRegex.test(contentLower)) {
+    message.channel.send('Imma goofy goober!');
+  } else if (dummyRegex.test(contentLower)) {
+    message.channel.send('thats me hehe XD');
+  } else if (tickleRegex.test(contentLower)) {
+    message.channel.send("It's tickle tuesday!");
+  } else if (downRegex.test(contentLower)) {
+    message.channel.send("I'm acutally DOWNS");
+  } else if (lolRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
+  } else if (lmaoRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
+  } else if (mattRegex.test(contentLower)) {
+    message.channel.send("Matt is my boss");
+  } else if (poopRegex.test(contentLower)) {
+    message.channel.send("ayooo let me join");
+  } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
+    message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+  }
 });
 
 function play(guild, song) {
@@ -126,30 +153,4 @@ function play(guild, song) {
   serverQueue.textChannel.send(`Now playing: ${song}`);
 }
 
-    if (bogaRegex.test(contentLower)) {
-      message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
-    } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
-      message.channel.send('Good night bogas!');
-    } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
-      message.channel.send("IT'S TIME TO COOK! @everyone");
-    } else if (goofyRegex.test(contentLower)) {
-      message.channel.send('Imma goofy goober!');
-    } else if (dummyRegex.test(contentLower)) {
-      message.channel.send('thats me hehe XD');
-    } else if (tickleRegex.test(contentLower)) {
-      message.channel.send("It's tickle tuesday!");
-    } else if (downRegex.test(contentLower)) {
-      message.channel.send("I'm acutally DOWNS");
-    } else if (lolRegex.test(contentLower)) {
-      message.channel.send("stop making me laugh so hard teehee");
-    } else if (lmaoRegex.test(contentLower)) {
-      message.channel.send("stop making me laugh so hard teehee");
-    } else if (mattRegex.test(contentLower)) {
-      message.channel.send("Matt is my boss");
-    } else if (poopRegex.test(contentLower)) {
-      message.channel.send("ayooo let me join");
-    } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
-      message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
-    }
-});
 client.login(process.env.DISCORD_TOKEN);

@@ -17,6 +17,7 @@ const mattRegex = /m+a+t+t+/;
 const poopRegex = /p+o+o+p/;
 const dance1Regex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
 const dance2Regex = /d+a+n+c+e+/;
+const commandRegex = /z+z+t+r+o+/;
 // Create a new client instance with the specified intents
 const client = new Client({
   intents: [
@@ -150,6 +151,18 @@ client.on('messageCreate', async message => {
     message.channel.send("ayooo let me join");
   } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
     message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+  } else if (commandRegex.test(contentLower)) {
+    message.channel.send(`\`\`\`
+    Hello. Boga AI here to play some music for you. Here are the functions for using Boga Music Player.
+    
+    Please use the "Boga Music" voice channel to listen to music
+    
+    !play [insert youtube link] = plays song
+      -> if done again adds the song to queue
+    !stop = stop song & clears queue
+    !pause = pause
+    !skip = skips to next song in queue
+    \`\`\``);
   }
 });
 

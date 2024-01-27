@@ -79,6 +79,9 @@ client.on('messageCreate', async message => {
         return;
       }
     }
+    const videoInfo = await ytdl.getInfo(youtubeURL);
+    const videoTitle = videoInfo.videoDetails.title;
+    const song = { url: youtubeURL, title: videoTitle };
 
     if (!serverQueue) {
       // Create a queue since one doesn't exist
@@ -91,7 +94,7 @@ client.on('messageCreate', async message => {
         playing: true,
       };
       queues.set(message.guild.id, queue);
-      queue.songs.push(youtubeURL);
+      queue.songs.push(song);
 
       try {
         const connection = joinVoiceChannel({
@@ -109,7 +112,7 @@ client.on('messageCreate', async message => {
         });
       }
     } else {
-      serverQueue.songs.push(youtubeURL);
+      serverQueue.songs.push(song);
 
       const timeout = inactivityTimeouts.get(message.guild.id);
       if (timeout) {
@@ -145,6 +148,21 @@ client.on('messageCreate', async message => {
         setTimeout(() => sentMessage.delete().catch(console.error), 3000);
       });
     }
+  } else if (contentLower === '!queue') {
+    if (!serverQueue || serverQueue.songs.length === 0) {
+      message.channel.send('There are no songs in the queue.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
+      return;
+    }
+    let queueMessage = 'Current queue:\n';
+    serverQueue.songs.forEach((song, index) => {
+      queueMessage += `${index + 1}. ${song.title}\n`;
+    });
+
+    message.channel.send(queueMessage).then(sentMessage => {
+      setTimeout(() => sentMessage.delete().catch(console.error), 10000);
+    });
   }
 
   if (contentLower === '!skip') {
@@ -241,7 +259,7 @@ function play(guild, song) {
     return;
   }
 
-  const stream = ytdl(song, { filter: 'audioonly' });
+  const stream = ytdl(song.url, { filter: 'audioonly' });
   const resource = createAudioResource(stream);
   if (!serverQueue.player) {
     serverQueue.player = createAudioPlayer();
@@ -252,8 +270,8 @@ function play(guild, song) {
   serverQueue.player.play(resource);
 
   serverQueue.player.on(AudioPlayerStatus.Idle, () => {
-    serverQueue.songs.shift(); // Remove the finished song from the queue
-    // Set a timeout to leave the channel after 5 minutes of inactivity
+    serverQueue.songs.shift();
+    
     const inactivityTimeout = setTimeout(() => {
       if (serverQueue.connection) {
         serverQueue.connection.destroy();
@@ -272,7 +290,7 @@ function play(guild, song) {
     play(guild, serverQueue.songs[0]);
   });
 
-  serverQueue.textChannel.send(`Now playing: ${song}`).then(sentMessage => {
+  serverQueue.textChannel.send(`Now playing: ${song.title}`).then(sentMessage => {
     setTimeout(() => sentMessage.delete().catch(console.error), 3000);
   });
 }

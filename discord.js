@@ -46,14 +46,16 @@ client.on('messageCreate', async message => {
 
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
     const chatMessage = message.content.slice('!chat'.length).trim();
-
+  
     try {
-      const gptResponse = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: chatMessage,
-        max_tokens: 150,
+      const gptResponse = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{
+          role: "user",
+          content: chatMessage
+        }],
       });
-      message.channel.send(gptResponse.data.choices[0].text);
+      message.channel.send(gptResponse.data.choices[0].message.content);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

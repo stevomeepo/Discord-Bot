@@ -20,6 +20,7 @@ const poopRegex = /p+o+o+p/;
 const dance1Regex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
 const dance2Regex = /d+a+n+c+e+/;
 const commandRegex = /z+z+t+r+o+/;
+const commandChatGPTRegex = /z+p+n+n+/;
 // Create a new client instance with the specified intents
 const client = new Client({
   intents: [
@@ -66,12 +67,14 @@ client.on('messageCreate', async message => {
       message.channel.send(response.data.choices[0].message.content);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
-      message.channel.send('Sorry, I encountered an error trying to respond to your message.');
+      message.channel.send('Sorry, I encountered an error trying to respond to your message.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   }
 
   if (message.author.bot || message.channel.id !== '1199841447579500564') return;
-  setTimeout(() => message.delete().catch(console.error), 1000);
+  // setTimeout(() => message.delete().catch(console.error), 1000);
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
 
@@ -274,7 +277,17 @@ client.on('messageCreate', async message => {
     !queue = shows a list of what songs are in queue
     !repeat / !replay = repeats or replays current song
     \`\`\``);
-  } 
+  }  else if (commandChatGPTRegex.test(contentLower)) {
+    message.channel.send(`\`\`\`
+    Hello. I am actually not dumb here. I am now able
+    to be somewhat helpful.
+
+    Please type "!chat" followed by what you want to
+    ask me or tell me.
+
+    Thanks!
+    \`\`\``);
+  }
 });
 
 function play(guild, song, isRepeating = false) {

@@ -33,6 +33,8 @@ const client = new Client({
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+console.log(openai);
 // Event listener when the bot becomes ready to start working
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);

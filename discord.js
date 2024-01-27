@@ -37,7 +37,8 @@ let player;
 
 client.on('messageCreate', async message => {
 
-  if (message.author.bot) return;
+  if (message.author.bot || message.channel.id !== '1199841447579500564') return;
+  setTimeout(() => message.delete().catch(console.error), 1000);
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
 

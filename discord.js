@@ -45,6 +45,61 @@ let player;
 
 client.on('messageCreate', async message => {
 
+  if (message.author.bot) return;
+
+  const contentLower = message.content.toLowerCase();
+
+  if (bogaRegex.test(contentLower)) {
+    message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
+  } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
+    message.channel.send('Good night bogas!');
+  } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
+    message.channel.send("IT'S TIME TO COOK! @everyone");
+  } else if (goofyRegex.test(contentLower)) {
+    message.channel.send('Imma goofy goober!');
+  } else if (dummyRegex.test(contentLower)) {
+    message.channel.send('thats me hehe XD');
+  } else if (tickleRegex.test(contentLower)) {
+    message.channel.send("It's tickle tuesday!");
+  } else if (downRegex.test(contentLower)) {
+    message.channel.send("I'm acutally DOWNS");
+  } else if (lolRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
+  } else if (lmaoRegex.test(contentLower)) {
+    message.channel.send("stop making me laugh so hard teehee");
+  } else if (mattRegex.test(contentLower)) {
+    message.channel.send("Matt is my boss");
+  } else if (poopRegex.test(contentLower)) {
+    message.channel.send("ayooo let me join");
+  } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
+    message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+  } else if (commandRegex.test(contentLower)) {
+    message.channel.send(`\`\`\`
+    Hello. Boga AI here to play some music for you.
+    Here are the functions for using Boga Music Player.
+    
+    Please use the "Boga Music" voice channel to listen to music
+    
+    !play [insert youtube link] or keywords = plays song
+      -> if done again adds the song to queue
+    !stop = stop song & clears queue
+    !pause = pause
+    !skip = skips to next song in queue
+    !queue = shows a list of what songs are in queue
+    !repeat / !replay = repeats or replays current song
+    \`\`\``);
+  }  else if (commandChatGPTRegex.test(contentLower)) {
+    message.channel.send(`\`\`\`
+    Hello. I am actually not dumb here. I am now able
+    to be somewhat helpful.
+
+    Please type "!chat" followed by what you want to
+    ask me or tell me.
+
+    Thanks!
+    \`\`\``);
+  }
+
   const chatChannelId = '1200653582584778772';
 
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
@@ -75,7 +130,6 @@ client.on('messageCreate', async message => {
 
   if (message.author.bot || message.channel.id !== '1199841447579500564') return;
   // setTimeout(() => message.delete().catch(console.error), 1000);
-  const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
 
   if (contentLower.startsWith('!play')) {
@@ -238,56 +292,6 @@ client.on('messageCreate', async message => {
   }
 
   // The following conditions should be inside the messageCreate event listener
-  if (bogaRegex.test(contentLower)) {
-    message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
-  } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
-    message.channel.send('Good night bogas!');
-  } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
-    message.channel.send("IT'S TIME TO COOK! @everyone");
-  } else if (goofyRegex.test(contentLower)) {
-    message.channel.send('Imma goofy goober!');
-  } else if (dummyRegex.test(contentLower)) {
-    message.channel.send('thats me hehe XD');
-  } else if (tickleRegex.test(contentLower)) {
-    message.channel.send("It's tickle tuesday!");
-  } else if (downRegex.test(contentLower)) {
-    message.channel.send("I'm acutally DOWNS");
-  } else if (lolRegex.test(contentLower)) {
-    message.channel.send("stop making me laugh so hard teehee");
-  } else if (lmaoRegex.test(contentLower)) {
-    message.channel.send("stop making me laugh so hard teehee");
-  } else if (mattRegex.test(contentLower)) {
-    message.channel.send("Matt is my boss");
-  } else if (poopRegex.test(contentLower)) {
-    message.channel.send("ayooo let me join");
-  } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
-    message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
-  } else if (commandRegex.test(contentLower)) {
-    message.channel.send(`\`\`\`
-    Hello. Boga AI here to play some music for you.
-    Here are the functions for using Boga Music Player.
-    
-    Please use the "Boga Music" voice channel to listen to music
-    
-    !play [insert youtube link] or keywords = plays song
-      -> if done again adds the song to queue
-    !stop = stop song & clears queue
-    !pause = pause
-    !skip = skips to next song in queue
-    !queue = shows a list of what songs are in queue
-    !repeat / !replay = repeats or replays current song
-    \`\`\``);
-  }  else if (commandChatGPTRegex.test(contentLower)) {
-    message.channel.send(`\`\`\`
-    Hello. I am actually not dumb here. I am now able
-    to be somewhat helpful.
-
-    Please type "!chat" followed by what you want to
-    ask me or tell me.
-
-    Thanks!
-    \`\`\``);
-  }
 });
 
 function play(guild, song, isRepeating = false) {

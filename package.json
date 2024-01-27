@@ -7,6 +7,7 @@
     "express": "^4.18.2",
     "libsodium-wrappers": "^0.7.13",
     "node-fetch": "^3.3.2",
+    "openai": "^4.26.0",
     "opusscript": "^0.1.1",
     "youtube-search": "^1.1.6",
     "youtube-sr": "^4.3.10"

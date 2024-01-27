@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const axios = require('axios');
+const { OpenAIAPI } = require('openai');
 const queues = new Map();
 const inactivityTimeouts = new Map();
 const cookRegex = /c+o+o+k+/;
@@ -28,6 +29,10 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates
   ]
 });
+
+const openai = new OpenAIAPI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 // Event listener when the bot becomes ready to start working
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -36,6 +41,24 @@ client.on('ready', () => {
 let player;
 
 client.on('messageCreate', async message => {
+
+  const chatChannelId = '1200653582584778772';
+
+  if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
+    const chatMessage = message.content.slice('!chat'.length).trim();
+
+    try {
+      const gptResponse = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: chatMessage,
+        max_tokens: 150,
+      });
+      message.channel.send(gptResponse.data.choices[0].text);
+    } catch (error) {
+      console.error('Error getting response from OpenAI:', error);
+      message.channel.send('Sorry, I encountered an error trying to respond to your message.');
+    }
+  }
 
   if (message.author.bot || message.channel.id !== '1199841447579500564') return;
   setTimeout(() => message.delete().catch(console.error), 1000);

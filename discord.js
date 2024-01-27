@@ -44,11 +44,7 @@ client.on('ready', () => {
 let player;
 
 client.on('messageCreate', async message => {
-
-  if (message.author.bot) return;
-
   const contentLower = message.content.toLowerCase();
-
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
@@ -102,7 +98,7 @@ client.on('messageCreate', async message => {
 
   const chatChannelId = '1200653582584778772';
 
-  if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
+  if (message.channel.id === chatChannelId && contentLower.startsWith('!chat')) {
     const chatMessage = message.content.slice('!chat'.length).trim();
   
     try {
@@ -128,170 +124,169 @@ client.on('messageCreate', async message => {
     }
   }
 
-  if (message.author.bot || message.channel.id !== '1199841447579500564') return;
-  // setTimeout(() => message.delete().catch(console.error), 1000);
-  const serverQueue = queues.get(message.guild.id);
+  if (message.channel.id == '1199841447579500564') {
+    const serverQueue = queues.get(message.guild.id);
 
-  if (contentLower.startsWith('!play')) {
-    const args = message.content.split(' ');
-    if (args.length < 2) {
-      (await message.channel.send('Please provide a YouTube URL or some keywords to search for.')).then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-      return;
-    }
-    const searchString = args.slice(1).join(' ');
-    let youtubeURL;
-
-    // Check if the argument is a valid YouTube URL
-    if (ytdl.validateURL(searchString)) {
-      youtubeURL = searchString;
-    } else {
-      // Use the YouTube Data API to search for a video
-      const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchString)}&type=video&key=${process.env.YOUTUBE_API_KEY}`;
-
-      try {
-        const response = await axios.get(youtubeSearchUrl);
-        const videos = response.data.items;
-        if (!videos || videos.length === 0) {
-          message.channel.send('No videos found with those keywords.').then(sentMessage => {
-            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-          });
-          return;
-        }
-        const firstVideoId = videos[0].id.videoId;
-        youtubeURL = `https://www.youtube.com/watch?v=${firstVideoId}`;
-      } catch (err) {
-        console.error(err);
-        message.channel.send('Failed to search for video.').then(sentMessage => {
+    if (contentLower.startsWith('!play')) {
+      const args = message.content.split(' ');
+      if (args.length < 2) {
+        (await message.channel.send('Please provide a YouTube URL or some keywords to search for.')).then(sentMessage => {
           setTimeout(() => sentMessage.delete().catch(console.error), 3000);
         });
         return;
       }
-    }
-    const videoInfo = await ytdl.getInfo(youtubeURL);
-    const videoTitle = videoInfo.videoDetails.title;
-    const song = { url: youtubeURL, title: videoTitle };
-
-    if (!serverQueue) {
-      // Create a queue since one doesn't exist
-      const queue = {
-        textChannel: message.channel,
-        voiceChannel: message.member.voice.channel,
-        connection: null,
-        songs: [],
-        volume: 5,
-        playing: true,
-      };
-      queues.set(message.guild.id, queue);
-      queue.songs.push(song);
-
-      try {
-        const connection = joinVoiceChannel({
-          channelId: message.member.voice.channelId,
-          guildId: message.guild.id,
-          adapterCreator: message.guild.voiceAdapterCreator,
-        });
-        queue.connection = connection;
-        play(message.guild, queue.songs[0]);
-      } catch (err) {
-        console.error(err);
-        queues.delete(message.guild.id);
-        message.channel.send('Failed to join the voice channel.').then(sentMessage => {
-          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-        });
-      }
-    } else {
-      serverQueue.songs.push(song);
-
-      const timeout = inactivityTimeouts.get(message.guild.id);
-      if (timeout) {
-        clearTimeout(timeout);
-        inactivityTimeouts.delete(message.guild.id);
-      }
-      message.channel.send(`Added to queue: ${youtubeURL}`).then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-    }
-  } else if (contentLower === '!stop') {
-    if (serverQueue) {
-      serverQueue.songs = [];
-      if (serverQueue.connection) {
-        serverQueue.connection.destroy();
-      }
-      queues.delete(message.guild.id);
-      message.channel.send('Stopped the music and cleared the queue.').then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-    }
-  } else if (contentLower === '!pause') {
-    if (serverQueue && serverQueue.player) {
-      serverQueue.player.pause();
-      message.channel.send('Paused the music.').then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-    }
-  } else if (contentLower === '!resume') {
-    if (serverQueue && serverQueue.player) {
-      serverQueue.player.unpause();
-      message.channel.send('Resumed the music.').then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-    }
-  } else if (contentLower === '!queue') {
-    if (!serverQueue || serverQueue.songs.length === 0) {
-      message.channel.send('There are no songs in the queue.').then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-      });
-      return;
-    }
-    let queueMessage = 'Current queue:\n';
-    serverQueue.songs.forEach((song, index) => {
-      queueMessage += `${index + 1}. ${song.title}\n`;
-    });
-
-    message.channel.send(queueMessage).then(sentMessage => {
-      setTimeout(() => sentMessage.delete().catch(console.error), 10000);
-    });
-  } else if (contentLower === '!repeat' || contentLower === '!replay') {
-    if (!serverQueue) {
-      message.channel.send('There is no song currently playing.');
-      return;
-    }
-    if (serverQueue.songs.length === 0) {
-      message.channel.send('There is no song to repeat.');
-      return;
-    }
-    // Call the play function with the current song and set isRepeating to true
-    play(message.guild, serverQueue.songs[0], true);
-    message.channel.send(`Repeating: ${serverQueue.songs[0].title}`);
-  }
-
-  if (contentLower === '!skip') {
-    if (serverQueue && serverQueue.songs.length > 0) {
-      serverQueue.songs.shift(); // Skip the current song
-      if (serverQueue.songs.length > 0) {
-        play(message.guild, serverQueue.songs[0]); // Play the next song
-        message.channel.send('Skipped the song and playing the next one.').then(sentMessage => {
-          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
-        });
+      const searchString = args.slice(1).join(' ');
+      let youtubeURL;
+  
+      // Check if the argument is a valid YouTube URL
+      if (ytdl.validateURL(searchString)) {
+        youtubeURL = searchString;
       } else {
+        // Use the YouTube Data API to search for a video
+        const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchString)}&type=video&key=${process.env.YOUTUBE_API_KEY}`;
+  
+        try {
+          const response = await axios.get(youtubeSearchUrl);
+          const videos = response.data.items;
+          if (!videos || videos.length === 0) {
+            message.channel.send('No videos found with those keywords.').then(sentMessage => {
+              setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+            });
+            return;
+          }
+          const firstVideoId = videos[0].id.videoId;
+          youtubeURL = `https://www.youtube.com/watch?v=${firstVideoId}`;
+        } catch (err) {
+          console.error(err);
+          message.channel.send('Failed to search for video.').then(sentMessage => {
+            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+          });
+          return;
+        }
+      }
+      const videoInfo = await ytdl.getInfo(youtubeURL);
+      const videoTitle = videoInfo.videoDetails.title;
+      const song = { url: youtubeURL, title: videoTitle };
+  
+      if (!serverQueue) {
+        // Create a queue since one doesn't exist
+        const queue = {
+          textChannel: message.channel,
+          voiceChannel: message.member.voice.channel,
+          connection: null,
+          songs: [],
+          volume: 5,
+          playing: true,
+        };
+        queues.set(message.guild.id, queue);
+        queue.songs.push(song);
+  
+        try {
+          const connection = joinVoiceChannel({
+            channelId: message.member.voice.channelId,
+            guildId: message.guild.id,
+            adapterCreator: message.guild.voiceAdapterCreator,
+          });
+          queue.connection = connection;
+          play(message.guild, queue.songs[0]);
+        } catch (err) {
+          console.error(err);
+          queues.delete(message.guild.id);
+          message.channel.send('Failed to join the voice channel.').then(sentMessage => {
+            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+          });
+        }
+      } else {
+        serverQueue.songs.push(song);
+  
+        const timeout = inactivityTimeouts.get(message.guild.id);
+        if (timeout) {
+          clearTimeout(timeout);
+          inactivityTimeouts.delete(message.guild.id);
+        }
+        message.channel.send(`Added to queue: ${youtubeURL}`).then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
+      }
+    } else if (contentLower === '!stop') {
+      if (serverQueue) {
+        serverQueue.songs = [];
         if (serverQueue.connection) {
           serverQueue.connection.destroy();
         }
         queues.delete(message.guild.id);
-        message.channel.send('Skipped the song. The queue is now empty.').then(sentMessage => {
+        message.channel.send('Stopped the music and cleared the queue.').then(sentMessage => {
           setTimeout(() => sentMessage.delete().catch(console.error), 3000);
         });
       }
-    } else {
-      message.channel.send('There is no song to skip.').then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+    } else if (contentLower === '!pause') {
+      if (serverQueue && serverQueue.player) {
+        serverQueue.player.pause();
+        message.channel.send('Paused the music.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
+      }
+    } else if (contentLower === '!resume') {
+      if (serverQueue && serverQueue.player) {
+        serverQueue.player.unpause();
+        message.channel.send('Resumed the music.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
+      }
+    } else if (contentLower === '!queue') {
+      if (!serverQueue || serverQueue.songs.length === 0) {
+        message.channel.send('There are no songs in the queue.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
+        return;
+      }
+      let queueMessage = 'Current queue:\n';
+      serverQueue.songs.forEach((song, index) => {
+        queueMessage += `${index + 1}. ${song.title}\n`;
       });
+  
+      message.channel.send(queueMessage).then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 10000);
+      });
+    } else if (contentLower === '!repeat' || contentLower === '!replay') {
+      if (!serverQueue) {
+        message.channel.send('There is no song currently playing.');
+        return;
+      }
+      if (serverQueue.songs.length === 0) {
+        message.channel.send('There is no song to repeat.');
+        return;
+      }
+      // Call the play function with the current song and set isRepeating to true
+      play(message.guild, serverQueue.songs[0], true);
+      message.channel.send(`Repeating: ${serverQueue.songs[0].title}`);
+    }
+  
+    if (contentLower === '!skip') {
+      if (serverQueue && serverQueue.songs.length > 0) {
+        serverQueue.songs.shift(); // Skip the current song
+        if (serverQueue.songs.length > 0) {
+          play(message.guild, serverQueue.songs[0]); // Play the next song
+          message.channel.send('Skipped the song and playing the next one.').then(sentMessage => {
+            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+          });
+        } else {
+          if (serverQueue.connection) {
+            serverQueue.connection.destroy();
+          }
+          queues.delete(message.guild.id);
+          message.channel.send('Skipped the song. The queue is now empty.').then(sentMessage => {
+            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+          });
+        }
+      } else {
+        message.channel.send('There is no song to skip.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
+      }
     }
   }
-
-  // The following conditions should be inside the messageCreate event listener
+  return;
 });
 
 function play(guild, song, isRepeating = false) {

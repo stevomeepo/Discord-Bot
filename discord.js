@@ -272,6 +272,8 @@ function play(guild, song) {
     play(guild, serverQueue.songs[0]);
   });
 
-  serverQueue.textChannel.send(`Now playing: ${song}`);
+  serverQueue.textChannel.send(`Now playing: ${song}`).then(sentMessage => {
+    setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+  });
 }
 client.login(process.env.DISCORD_TOKEN);

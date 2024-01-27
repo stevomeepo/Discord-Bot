@@ -50,14 +50,14 @@ client.on('messageCreate', async message => {
     const chatMessage = message.content.slice('!chat'.length).trim();
   
     try {
-      const gptResponse = await openai.createChatCompletion({
+      const gptResponse = await openai.chat.createCompletion({
         model: "gpt-3.5-turbo",
         messages: [{
           role: "user",
           content: chatMessage
         }],
       });
-      message.channel.send(gptResponse.data.choices[0].message.content);
+      message.channel.send(gptResponse.choices[0].message.content);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

@@ -36,11 +36,8 @@ client.on('ready', () => {
 let player;
 
 client.on('messageCreate', async message => {
-
-  if (message.author.bot || message.channel.id !== '1199841447579500564') return;
-
-  setTimeout(() => message.delete().catch(console.error), 1000);
-
+  
+  if (message.author.bot) return;
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
 
@@ -178,12 +175,12 @@ client.on('messageCreate', async message => {
     message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
   } else if (commandRegex.test(contentLower)) {
     message.channel.send(`\`\`\`
-    Hello. Boga AI here to play some music for you.
+    Hello. Boga AI :bogatilt: here to play some music for you.
     Here are the functions for using Boga Music Player.
     
     Please use the "Boga Music" voice channel to listen to music
     
-    !play [insert youtube link] or keywords = plays song
+    !play [insert youtube link] = plays song
       -> if done again adds the song to queue
     !stop = stop song & clears queue
     !pause = pause

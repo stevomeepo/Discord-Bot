@@ -196,6 +196,18 @@ client.on('messageCreate', async message => {
     message.channel.send(queueMessage).then(sentMessage => {
       setTimeout(() => sentMessage.delete().catch(console.error), 10000);
     });
+  } else if (contentLower === '!repeat' || contentLower === '!replay') {
+    if (!serverQueue) {
+      message.channel.send('There is no song currently playing.');
+      return;
+    }
+    if (serverQueue.songs.length === 0) {
+      message.channel.send('There is no song to repeat.');
+      return;
+    }
+    // Call the play function with the current song and set isRepeating to true
+    play(message.guild, serverQueue.songs[0], true);
+    message.channel.send(`Repeating: ${serverQueue.songs[0].title}`);
   }
 
   if (contentLower === '!skip') {
@@ -259,15 +271,30 @@ client.on('messageCreate', async message => {
     !stop = stop song & clears queue
     !pause = pause
     !skip = skips to next song in queue
+    !queue = shows a list of what songs are in queue
+    !repeat / !replay = repeats or replays current song
     \`\`\``);
   } 
 });
 
-function play(guild, song) {
+function play(guild, song, isRepeating = false) {
   const serverQueue = queues.get(guild.id);
   if (!serverQueue) {
     console.log('No server queue found.');
     return;
+  }
+
+  if (isRepeating) {
+    if (serverQueue.player) {
+      serverQueue.player.stop();
+      const stream = ytdl(song.url, { filter: 'audioonly' });
+      const resource = createAudioResource(stream);
+      serverQueue.player.play(resource);
+      serverQueue.player.once(AudioPlayerStatus.Idle, () => {
+        play(guild, serverQueue.songs[0]);
+      });
+      return;
+    }
   }
 
   // Clear the existing inactivity timeout if there is one

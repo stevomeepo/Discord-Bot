@@ -45,7 +45,9 @@ client.on('messageCreate', async message => {
   if (contentLower.startsWith('!play')) {
     const args = message.content.split(' ');
     if (args.length < 2) {
-      message.channel.send('Please provide a YouTube URL or some keywords to search for.');
+      (await message.channel.send('Please provide a YouTube URL or some keywords to search for.')).then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
       return;
     }
     const searchString = args.slice(1).join(' ');
@@ -62,14 +64,18 @@ client.on('messageCreate', async message => {
         const response = await axios.get(youtubeSearchUrl);
         const videos = response.data.items;
         if (!videos || videos.length === 0) {
-          message.channel.send('No videos found with those keywords.');
+          message.channel.send('No videos found with those keywords.').then(sentMessage => {
+            setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+          });
           return;
         }
         const firstVideoId = videos[0].id.videoId;
         youtubeURL = `https://www.youtube.com/watch?v=${firstVideoId}`;
       } catch (err) {
         console.error(err);
-        message.channel.send('Failed to search for video.');
+        message.channel.send('Failed to search for video.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
         return;
       }
     }
@@ -98,7 +104,9 @@ client.on('messageCreate', async message => {
       } catch (err) {
         console.error(err);
         queues.delete(message.guild.id);
-        message.channel.send('Failed to join the voice channel.');
+        message.channel.send('Failed to join the voice channel.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
       }
     } else {
       serverQueue.songs.push(youtubeURL);
@@ -108,7 +116,9 @@ client.on('messageCreate', async message => {
         clearTimeout(timeout);
         inactivityTimeouts.delete(message.guild.id);
       }
-      message.channel.send(`Added to queue: ${youtubeURL}`);
+      message.channel.send(`Added to queue: ${youtubeURL}`).then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   } else if (contentLower === '!stop') {
     if (serverQueue) {
@@ -117,17 +127,23 @@ client.on('messageCreate', async message => {
         serverQueue.connection.destroy();
       }
       queues.delete(message.guild.id);
-      message.channel.send('Stopped the music and cleared the queue.');
+      message.channel.send('Stopped the music and cleared the queue.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   } else if (contentLower === '!pause') {
     if (serverQueue && serverQueue.player) {
       serverQueue.player.pause();
-      message.channel.send('Paused the music.');
+      message.channel.send('Paused the music.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   } else if (contentLower === '!resume') {
     if (serverQueue && serverQueue.player) {
       serverQueue.player.unpause();
-      message.channel.send('Resumed the music.');
+      message.channel.send('Resumed the music.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   }
 
@@ -136,16 +152,22 @@ client.on('messageCreate', async message => {
       serverQueue.songs.shift(); // Skip the current song
       if (serverQueue.songs.length > 0) {
         play(message.guild, serverQueue.songs[0]); // Play the next song
-        message.channel.send('Skipped the song and playing the next one.');
+        message.channel.send('Skipped the song and playing the next one.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
       } else {
         if (serverQueue.connection) {
           serverQueue.connection.destroy();
         }
         queues.delete(message.guild.id);
-        message.channel.send('Skipped the song. The queue is now empty.');
+        message.channel.send('Skipped the song. The queue is now empty.').then(sentMessage => {
+          setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+        });
       }
     } else {
-      message.channel.send('There is no song to skip.');
+      message.channel.send('There is no song to skip.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
     }
   }
 

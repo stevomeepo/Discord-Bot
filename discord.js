@@ -34,7 +34,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-console.log(openai);
+// console.log(openai);
 // Event listener when the bot becomes ready to start working
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -50,14 +50,20 @@ client.on('messageCreate', async message => {
     const chatMessage = message.content.slice('!chat'.length).trim();
   
     try {
-      const gptResponse = await openai.chat.createCompletion({
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: "gpt-3.5-turbo",
         messages: [{
           role: "user",
           content: chatMessage
         }],
+      }, {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
-      message.channel.send(gptResponse.choices[0].message.content);
+  
+      message.channel.send(response.data.choices[0].message.content);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

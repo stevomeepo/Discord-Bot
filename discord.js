@@ -30,7 +30,7 @@ const client = new Client({
   ]
 });
 
-const openai = new OpenAIAPI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 // Event listener when the bot becomes ready to start working

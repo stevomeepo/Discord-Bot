@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const axios = require('axios');
 const queues = new Map();
 const inactivityTimeouts = new Map();
 const cookRegex = /c+o+o+k+/;
@@ -42,13 +43,33 @@ client.on('messageCreate', async message => {
   if (contentLower.startsWith('!play')) {
     const args = message.content.split(' ');
     if (args.length < 2) {
-      message.channel.send('Please provide a YouTube URL.');
+      message.channel.send('Please provide a YouTube URL or some keywords to search for.');
       return;
     }
-    const youtubeURL = args[1];
-    if (!ytdl.validateURL(youtubeURL)) {
-      message.channel.send('Please provide a valid YouTube URL.');
-      return;
+    const searchString = args.slice(1).join(' ');
+    let youtubeURL;
+
+    // Check if the argument is a valid YouTube URL
+    if (ytdl.validateURL(searchString)) {
+      youtubeURL = searchString;
+    } else {
+      // Use the YouTube Data API to search for a video
+      const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchString)}&type=video&key=${process.env.YOUTUBE_API_KEY}`;
+
+      try {
+        const response = await axios.get(youtubeSearchUrl);
+        const videos = response.data.items;
+        if (!videos || videos.length === 0) {
+          message.channel.send('No videos found with those keywords.');
+          return;
+        }
+        const firstVideoId = videos[0].id.videoId;
+        youtubeURL = `https://www.youtube.com/watch?v=${firstVideoId}`;
+      } catch (err) {
+        console.error(err);
+        message.channel.send('Failed to search for video.');
+        return;
+      }
     }
 
     if (!serverQueue) {

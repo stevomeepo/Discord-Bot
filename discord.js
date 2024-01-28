@@ -38,6 +38,10 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 let player;
+
+if (bogaRegex.test(contentLower)) {
+  message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
+}
 client.on('messageCreate', async message => {
   const chatChannelId = '1200653582584778772';
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {

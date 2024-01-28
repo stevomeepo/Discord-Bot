@@ -27,6 +27,11 @@ let player;
 
 client.on('messageCreate', async message => {
   const chatChannelId = '1200653582584778772';
+
+  if (message.channel.id === chatChannelId) {
+    setTimeout(() => message.delete().catch(console.error), 1000);
+  }
+
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
     const chatMessage = message.content.slice('!chat'.length).trim();
   
@@ -45,8 +50,8 @@ client.on('messageCreate', async message => {
       });
   
       const sentMessage = await message.channel.send(response.data.choices[0].message.content);
-      setTimeout(() => sentMessage.delete().catch(console.error), 1000);
-      setTimeout(() => message.delete().catch(console.error), 1000);
+      setTimeout(() => sentMessage.delete().catch(console.error), 10000);
+      setTimeout(() => message.delete().catch(console.error), 10000);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

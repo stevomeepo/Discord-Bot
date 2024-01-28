@@ -39,10 +39,10 @@ client.on('ready', () => {
 });
 let player;
 
-if (bogaRegex.test(contentLower)) {
-  message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
-}
 client.on('messageCreate', async message => {
+  if (bogaRegex.test(contentLower)) {
+    message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
+  }
   const chatChannelId = '1200653582584778772';
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
     const chatMessage = message.content.slice('!chat'.length).trim();

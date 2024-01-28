@@ -50,7 +50,7 @@ client.on('messageCreate', async message => {
     const chatMessage = message.content.slice('!chat'.length).trim();
 
     try {
-      const gptResponse = await openai.createCompletion({
+      const gptResponse = openai.completions.create({
         model: "text-davinci-003",
         prompt: chatMessage,
         max_tokens: 150,

@@ -57,7 +57,8 @@ client.on('messageCreate', async message => {
         }
       });
   
-      message.channel.send(response.data.choices[0].message.content);
+      const sentMessage = await message.channel.send(response.data.choices[0].message.content);
+      setTimeout(() => sentMessage.delete().catch(console.error), 1000);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

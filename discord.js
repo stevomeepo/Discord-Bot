@@ -51,7 +51,7 @@ client.on('messageCreate', async message => {
 
     try {
       const gptResponse = openai.completions.create({
-        model: "text-davinci-002",
+        model: "davinci-codex",
         prompt: chatMessage,
         max_tokens: 150,
       });

@@ -3,7 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const axios = require('axios');
-const { OpenAIAPI } = require('openai');
+const { OpenAI } = require('openai');
 const queues = new Map();
 const inactivityTimeouts = new Map();
 const cookRegex = /c+o+o+k+/;
@@ -30,7 +30,7 @@ const client = new Client({
   ]
 });
 
-const openai = new OpenAIAPI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 // Event listener when the bot becomes ready to start working

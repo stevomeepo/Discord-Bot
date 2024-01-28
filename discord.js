@@ -215,7 +215,6 @@ client.on('messageCreate', async message => {
   }
 
   // The following conditions should be inside the messageCreate event listener
-  const contentLower = message.content.toLowerCase();
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {

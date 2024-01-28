@@ -6,20 +6,6 @@ const axios = require('axios');
 const { OpenAI } = require('openai');
 const queues = new Map();
 const inactivityTimeouts = new Map();
-const cookRegex = /c+o+o+k+/;
-const timeRegex = /t+i+m+e+/;
-const bogaRegex = /b+o+g+a+/;
-const goofyRegex = /g+o+o+f+y+/;
-const dummyRegex = /d+u+m+b+/;
-const tickleRegex = /t+i+c+k+l+e+/;
-const downRegex = /d+o+w+n+/;
-const lolRegex = /l+o+l+/;
-const lmaoRegex = /l+m+a+o+/;
-const mattRegex = /m+a+t+t+/;
-const poopRegex = /p+o+o+p/;
-const dance1Regex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
-const dance2Regex = /d+a+n+c+e+/;
-const commandRegex = /z+z+t+r+o+/;
 // Create a new client instance with the specified intents
 const client = new Client({
   intents: [
@@ -65,48 +51,6 @@ client.on('messageCreate', async message => {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');
     }
-  }
-
-  const makeLower = message.content.toLowerCase();
-  if (bogaRegex.test(makeLower)) {
-    message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
-  } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
-    message.channel.send('Good night bogas!');
-  } else if (cookRegex.test(makeLower) || timeRegex.test(makeLower)) {
-    message.channel.send("IT'S TIME TO COOK! @everyone");
-  } else if (goofyRegex.test(makeLower)) {
-    message.channel.send('Imma goofy goober!');
-  } else if (dummyRegex.test(makeLower)) {
-    message.channel.send('thats me hehe XD');
-  } else if (tickleRegex.test(makeLower)) {
-    message.channel.send("It's tickle tuesday!");
-  } else if (downRegex.test(makeLower)) {
-    message.channel.send("I'm acutally DOWNS");
-  } else if (lolRegex.test(makeLower)) {
-    message.channel.send("stop making me laugh so hard teehee");
-  } else if (lmaoRegex.test(makeLower)) {
-    message.channel.send("stop making me laugh so hard teehee");
-  } else if (mattRegex.test(makeLower)) {
-    message.channel.send("Matt is my boss");
-  } else if (poopRegex.test(makeLower)) {
-    message.channel.send("ayooo let me join");
-  } else if (dance1Regex.test(makeLower) || dance2Regex.test(makeLower)) {
-    message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
-  } else if (commandRegex.test(makeLower)) {
-    message.channel.send(`\`\`\`
-    Hello. Boga AI here to play some music for you.
-    Here are the functions for using Boga Music Player.
-    
-    Please use the "Boga Music" voice channel to listen to music
-    
-    !play [insert youtube link] or keywords = plays song
-      -> if done again adds the song to queue
-    !stop = stop song & clears queue
-    !pause = pause
-    !skip = skips to next song in queue
-    !queue = shows a list of what songs are in queue
-    !repeat / !replay = repeats or replays current song
-    \`\`\``);
   }
   if (message.author.bot || message.channel.id !== '1199841447579500564') return;
   setTimeout(() => message.delete().catch(console.error), 1000);

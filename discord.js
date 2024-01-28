@@ -28,7 +28,7 @@ let player;
 client.on('messageCreate', async message => {
   const chatChannelId = '1200653582584778772';
 
-  if (message.channel.id === chatChannelId && !message.content.toLowerCase().startsWith('!chat')) {
+  if (message.channel.id === chatChannelId && !message.content.toLowerCase().startsWith('!chat') && message.author.id !== client.user.id) {
     setTimeout(() => message.delete().catch(console.error), 1000);
   }
 

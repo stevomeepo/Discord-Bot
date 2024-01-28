@@ -42,6 +42,8 @@ let player;
 
 client.on('messageCreate', async message => {
 
+  if (message.author.bot) return;
+
   const chatChannelId = '1200653582584778772';
 
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
@@ -213,6 +215,7 @@ client.on('messageCreate', async message => {
   }
 
   // The following conditions should be inside the messageCreate event listener
+  const contentLower = message.content.toLowerCase();
   if (bogaRegex.test(contentLower)) {
     message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
   } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {

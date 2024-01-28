@@ -184,16 +184,22 @@ client.on('messageCreate', async message => {
     });
   } else if (contentLower === '!repeat' || contentLower === '!replay') {
     if (!serverQueue) {
-      message.channel.send('There is no song currently playing.');
+      (await message.channel.send('There is no song currently playing.')).then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
       return;
     }
     if (serverQueue.songs.length === 0) {
-      message.channel.send('There is no song to repeat.');
+      message.channel.send('There is no song to repeat.').then(sentMessage => {
+        setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+      });
       return;
     }
     // Call the play function with the current song and set isRepeating to true
     play(message.guild, serverQueue.songs[0], true);
-    message.channel.send(`Repeating: ${serverQueue.songs[0].title}`);
+    message.channel.send(`Repeating: ${serverQueue.songs[0].title}`).then(sentMessage => {
+      setTimeout(() => sentMessage.delete().catch(console.error), 3000);
+    });
   }
 
   if (contentLower === '!skip') {

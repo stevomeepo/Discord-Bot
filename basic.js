@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('basic.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;

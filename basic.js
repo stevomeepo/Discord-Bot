@@ -55,9 +55,11 @@ const client = new Client({
     } else if (poopRegex.test(contentLower)) {
       message.channel.send("ayooo let me join");
     } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
-        message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+        message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     } else if (stopRegex.test(contentLower)) {
         message.channel.send("Don't stop WON'T STOP!");
+    } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drake.test(contentLower)) {
+        message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     }
 });
     

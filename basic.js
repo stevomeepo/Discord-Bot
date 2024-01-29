@@ -16,7 +16,8 @@ const dance2Regex = /d+a+n+c+e+/i;
 const stopRegex = /s+t+o+p+/i;
 const winRegex = /d+u+b+/i;
 const winRegex2 = /w+i+n/i;
-const drake = /d+r+a+k+e/i;
+const drakeRegex = /d+r+a+k+e/i;
+const tiltRegex = /t+i+l+t/i;
 
 const client = new Client({
     intents: [
@@ -46,9 +47,7 @@ const client = new Client({
       message.channel.send("It's tickle tuesday!");
     } else if (downRegex.test(contentLower)) {
       message.channel.send("I'm acutally DOWNS");
-    } else if (lolRegex.test(contentLower)) {
-      message.channel.send("stop making me laugh so hard teehee");
-    } else if (lmaoRegex.test(contentLower)) {
+    } else if (lolRegex.test(contentLower) || (lmaoRegex.test(contentLower))) {
       message.channel.send("stop making me laugh so hard teehee");
     } else if (mattRegex.test(contentLower)) {
       message.channel.send("Matt is my boss");
@@ -58,9 +57,11 @@ const client = new Client({
         message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     } else if (stopRegex.test(contentLower)) {
         message.channel.send("Don't stop WON'T STOP!");
-    } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drake.test(contentLower)) {
+    } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drakeRegex.test(contentLower)) {
         message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
+    } else if (tiltRegex.test(contentLower)) {
+        message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
     }
 });
-    
-    client.login(process.env.BETA_TOKEN);
+
+client.login(process.env.BETA_TOKEN);

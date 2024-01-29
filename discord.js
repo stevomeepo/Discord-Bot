@@ -50,14 +50,17 @@ client.on('messageCreate', async message => {
       });
   
       const sentMessage = await message.channel.send(response.data.choices[0].message.content);
-      // setTimeout(() => sentMessage.delete().catch(console.error), 3 * 60 * 60 * 1000);
-      // setTimeout(() => message.delete().catch(console.error), 3 * 60 * 60 * 1000);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');
     }
   }
   if (message.author.bot || message.channel.id !== '1199841447579500564') return;
+  const commandPrefix = '!';
+  if (message.channel.id === musicCommandsChannelId && !message.content.startsWith(commandPrefix)) {
+    setTimeout(() => message.delete().catch(console.error), 1000);
+    return;
+  }
   setTimeout(() => message.delete().catch(console.error), 1000);
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);

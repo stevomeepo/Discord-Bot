@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, MessageEmbed } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const cookRegex = /c+o+o+k+/i;
 const timeRegex = /t+i+m+e+/i;
 const bogaRegex = /b+o+g+a+/i;
@@ -30,7 +30,6 @@ const client = new Client({
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
   });
-
   client.on('messageCreate', message => {
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
@@ -55,22 +54,13 @@ const client = new Client({
     } else if (poopRegex.test(contentLower)) {
       message.channel.send("ayooo let me join");
     } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
-        const embed = new client.MessageEmbed()
-          .setTitle("AY AY AY AYYY!")
-          .setImage("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
-        message.channel.send({ embeds: [embed] });
+        message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     } else if (stopRegex.test(contentLower)) {
         message.channel.send("Don't stop WON'T STOP!");
     } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drakeRegex.test(contentLower)) {
-      const embed = new client.MessageEmbed()
-        .setTitle("Anita Max Wynnnnn!")
-        .setImage("https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
-      message.channel.send({ embeds: [embed] });
+        message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     } else if (tiltRegex.test(contentLower)) {
-        const embed = new client.MessageEmbed()
-          .setTitle("Don't tilt!")
-          .setImage("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
-        message.channel.send({ embeds: [embed] });
+        message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
     }
 });
 

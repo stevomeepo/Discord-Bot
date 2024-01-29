@@ -57,14 +57,13 @@ client.on('messageCreate', async message => {
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');
     }
   }
-  if (message.author.bot || message.channel.id !== '1199841447579500564') return;
+  
   const musicCommandsChannelId = '1199841447579500564';
-  if (message.channel.id === musicCommandsChannelId) {
+  if (message.channel.id === musicCommandsChannelId && !message.content.startsWith('!') && message.author.id !== client.user.id) {
     setTimeout(() => message.delete().catch(console.error), 1000);
-    if (!message.content.startsWith('!')) {
-      return;
-    }
+    return; // Stop further processing to avoid executing command logic for non-commands
   }
+  
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
   if (contentLower.startsWith('!play')) {

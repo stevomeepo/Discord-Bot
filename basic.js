@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits } = require('basic.js');
 const cookRegex = /c+o+o+k+/;
 const timeRegex = /t+i+m+e+/;
 const bogaRegex = /b+o+g+a+/;
@@ -54,4 +54,4 @@ const client = new Client({
         message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     }});
     
-    client.login(process.env.DISCORD_TOKEN);
+    client.login(process.env.BETA_TOKEN);

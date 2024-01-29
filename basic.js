@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, MessageEmbed } = require('discord.js');
 const cookRegex = /c+o+o+k+/i;
 const timeRegex = /t+i+m+e+/i;
 const bogaRegex = /b+o+g+a+/i;
@@ -30,6 +30,7 @@ const client = new Client({
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
   });
+
   client.on('messageCreate', message => {
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
@@ -54,13 +55,22 @@ const client = new Client({
     } else if (poopRegex.test(contentLower)) {
       message.channel.send("ayooo let me join");
     } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
-        message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
+        const embed = new MessageEmbed()
+          .setTitle("AY AY AY AYYY!")
+          .setImage("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDY3ZHBhcjFtMnJpempucThwanAwa3d2bjR0ODUxbzhtcGlkZ2N6eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/THlB4bsoSA0Cc/giphy.gif");
+        message.channel.send({ embeds: [embed] });
     } else if (stopRegex.test(contentLower)) {
         message.channel.send("Don't stop WON'T STOP!");
     } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drakeRegex.test(contentLower)) {
-        message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
+      const embed = new MessageEmbed()
+        .setTitle("Anita Max Wynnnnn!")
+        .setImage("https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmN6Z2N0ZjEwZHF5a2M1a25jOW41djM2b3puOGgzamo4ZjRjZ2VobiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jSFfhtpHTpCkFrfYPN/giphy.gif");
+      message.channel.send({ embeds: [embed] });
     } else if (tiltRegex.test(contentLower)) {
-        message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
+        const embed = new MessageEmbed()
+          .setTitle("Don't tilt!")
+          .setImage("https://media1.tenor.com/m/Jc9jT66AJRwAAAAd/chipi-chipi-chapa-chapa.gif");
+        message.channel.send({ embeds: [embed] });
     }
 });
 

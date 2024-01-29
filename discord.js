@@ -37,7 +37,7 @@ client.on('messageCreate', async message => {
   
     try {
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-        model: "gpt-4",
+        model: "gpt-4-0613",
         messages: [{
           role: "user",
           content: chatMessage
@@ -63,7 +63,7 @@ client.on('messageCreate', async message => {
     setTimeout(() => message.delete().catch(console.error), 1000);
     return; // Stop further processing to avoid executing command logic for non-commands
   }
-  
+
   const contentLower = message.content.toLowerCase();
   const serverQueue = queues.get(message.guild.id);
   if (contentLower.startsWith('!play')) {

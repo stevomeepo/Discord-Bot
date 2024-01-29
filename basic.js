@@ -1,19 +1,22 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
-const cookRegex = /c+o+o+k+/;
-const timeRegex = /t+i+m+e+/;
-const bogaRegex = /b+o+g+a+/;
-const goofyRegex = /g+o+o+f+y+/;
-const dummyRegex = /d+u+m+b+/;
-const tickleRegex = /t+i+c+k+l+e+/;
-const downRegex = /d+o+w+n+/;
-const lolRegex = /l+o+l+/;
-const lmaoRegex = /l+m+a+o+/;
-const mattRegex = /m+a+t+t+/;
-const poopRegex = /p+o+o+p/;
+const cookRegex = /c+o+o+k+/i;
+const timeRegex = /t+i+m+e+/i;
+const bogaRegex = /b+o+g+a+/i;
+const goofyRegex = /g+o+o+f+y+/i;
+const dummyRegex = /d+u+m+b+/i;
+const tickleRegex = /t+i+c+k+l+e+/i;
+const downRegex = /d+o+w+n+/i;
+const lolRegex = /l+o+l+/i;
+const lmaoRegex = /l+m+a+o+/i;
+const mattRegex = /m+a+t+t+/i;
+const poopRegex = /p+o+o+p/i;
 const dance1Regex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
-const dance2Regex = /d+a+n+c+e+/;
-const stopRegex = /s+t+o+p+/;
+const dance2Regex = /d+a+n+c+e+/i;
+const stopRegex = /s+t+o+p+/i;
+const winRegex = /d+u+b+/i;
+const winRegex2 = /w+i+n/i;
+const drake = /d+r+a+k+e/i;
 
 const client = new Client({
     intents: [

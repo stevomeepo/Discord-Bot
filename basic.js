@@ -13,6 +13,7 @@ const mattRegex = /m+a+t+t+/;
 const poopRegex = /p+o+o+p/;
 const dance1Regex = /d+o+ *t+h+e+ *d+a+n+c+e+/i;
 const dance2Regex = /d+a+n+c+e+/;
+const stopRegex = /s+t+o+p+/;
 
 const client = new Client({
     intents: [
@@ -52,6 +53,9 @@ const client = new Client({
       message.channel.send("ayooo let me join");
     } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
         message.channel.send("https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
-    }});
+    } else if (stopRegex.test(contentLower)) {
+        message.channel.send("Don't stop WON'T STOP!");
+    }
+});
     
     client.login(process.env.BETA_TOKEN);

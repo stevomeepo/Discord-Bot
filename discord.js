@@ -72,7 +72,7 @@ client.on('messageCreate', async message => {
   }
   
   const musicCommandsChannelId = '1199841447579500564';
-  if (message.channel.id === musicCommandsChannelId && !message.content.startsWith('!') && message.author.id !== client.user.id) {
+  if (message.channel.id === musicCommandsChannelId && (!message.content.startsWith('!') || message.author.id !== client.user.id)) {
     setTimeout(() => message.delete().catch(console.error), 1000);
     return; // Stop further processing to avoid executing command logic for non-commands
   }

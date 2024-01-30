@@ -41,7 +41,7 @@ client.on('messageCreate', async message => {
       message.channel.send("Typing...").then(sentMsg => {
         typingMessage = sentMsg; // Assign the message once it's sent
       });
-    }, 5000);
+    }, 500);
 
     try {
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {

@@ -14,7 +14,8 @@ const client = new Client({
     'GuildMessages',
     'GuildVoiceStates',
     'MessageContent',
-    'MessageReactions'
+    'MessageReactionAdd',
+    'MessageReactionRemove'
   ]
 });
 const openai = new OpenAI({

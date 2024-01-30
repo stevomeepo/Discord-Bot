@@ -10,12 +10,11 @@ const inactivityTimeouts = new Map();
 // Create a new client instance with the specified intents
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.MessageReactionAdd,
-    GatewayIntentBits.MessageReactionRemove
+    'Guilds',
+    'GuildMessages',
+    'GuildVoiceStates',
+    'MessageReactionAdd',
+    'MessageReactionRemove'
   ]
 });
 const openai = new OpenAI({

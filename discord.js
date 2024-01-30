@@ -271,7 +271,24 @@ function play(guild, song, isRepeating = false) {
       return;
     }
   }
+
+  // Clear the existing inactivity timeout if there is one
+  const timeout = inactivityTimeouts.get(guild.id);
+  if (timeout) {
+    clearTimeout(timeout);
+    inactivityTimeouts.delete(guild.id);
+  }
   if (!song) {
+    if (serverQueue.connection) {
+      // Set a timeout to leave the channel after 5 minutes of inactivity
+      const inactivityTimeout = setTimeout(() => {
+        serverQueue.connection.destroy();
+        queues.delete(guild.id);
+        inactivityTimeouts.delete(guild.id);
+        console.log(`Left the voice channel in ${guild.name} due to inactivity.`);
+      }, 10800000);
+      inactivityTimeouts.set(guild.id, inactivityTimeout);
+    }
     return;
   }
   const stream = ytdl(song.url, { filter: 'audioonly' });

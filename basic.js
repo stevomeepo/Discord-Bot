@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
+const axios = require('axios');
 const cookRegex = /c+o+o+k+/i;
 const timeRegex = /t+i+m+e+/i;
 const bogaRegex = /b+o+g+a+/i;
@@ -19,6 +20,28 @@ const winRegex2 = /w+i+n/i;
 const drakeRegex = /d+r+a+k+e/i;
 const tiltRegex = /t+i+l+t/i;
 
+async function debate(argument) {
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-4-0613",
+      messages: [{
+        role: "user",
+        content: argument
+      }],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error getting response from OpenAI:', error);
+    return 'Sorry, I encountered an error trying to respond to your argument.';
+  }
+}
+
 const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -30,7 +53,10 @@ const client = new Client({
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
   });
-  client.on('messageCreate', message => {
+
+  const debateChannelId = '1201747136182755398';
+
+  client.on('messageCreate', async message => {
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
     if (bogaRegex.test(contentLower)) {
@@ -61,6 +87,15 @@ const client = new Client({
         message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     } else if (tiltRegex.test(contentLower)) {
         message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
+    }
+
+    if (contentLower.startsWith('!debate')) {
+      if (message.channel.id !== debateChannelId) {
+        return;
+      }
+      const argument = message.content.slice('!debate'.length).trim();
+      const response = await debate(argument);
+      message.channel.send(response);
     }
 });
 

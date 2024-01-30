@@ -23,9 +23,41 @@ const openai = new OpenAI({
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
+
+async function debate(argument) {
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-4-0613",
+      messages: [{
+        role: "user",
+        content: argument
+      }],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error getting response from OpenAI:', error);
+    return 'Sorry, I encountered an error trying to respond to your argument.';
+  }
+}
+
 let player;
 
 client.on('messageCreate', async message => {
+
+  const debateChannelId = '1201747136182755398';
+
+  if (message.channel.id === debateChannelId && message.content.toLowerCase().startsWith('!debate')) {
+    const argument = message.content.slice('!debate'.length).trim();
+    const response = await debate(argument);
+    message.channel.send(response);
+  }
+  
   const chatChannelId = '1200653582584778772';
 
   if (message.channel.id === chatChannelId && !message.content.toLowerCase().startsWith('!chat') && message.author.id !== client.user.id) {

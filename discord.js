@@ -286,7 +286,7 @@ function play(guild, song, isRepeating = false) {
         queues.delete(guild.id);
         inactivityTimeouts.delete(guild.id);
         console.log(`Left the voice channel in ${guild.name} due to inactivity.`);
-      }, 300000); // 5 minutes in milliseconds
+      }, 10800000);
       inactivityTimeouts.set(guild.id, inactivityTimeout);
     }
     return;

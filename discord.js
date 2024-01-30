@@ -13,8 +13,8 @@ const client = new Client({
     'Guilds',
     'GuildMessages',
     'GuildVoiceStates',
-    'MessageReactionAdd',
-    'MessageReactionRemove'
+    'MessageContent',
+    'MessageReactions'
   ]
 });
 const openai = new OpenAI({

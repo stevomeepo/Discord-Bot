@@ -193,7 +193,11 @@ client.on('messageCreate', async message => {
         queueMessage += `${index + 1}. ${song.title}\n`;
       });
       message.channel.send(queueMessage).then(sentMessage => {
-        setTimeout(() => sentMessage.delete().catch(console.error), 10000);
+        setTimeout(() => {
+          sentMessage.delete().catch(error => {
+            console.error('Failed to delete the queue message:', error);
+          });
+        }, 10000);
       });
     } else if (contentLower === '!repeat' || contentLower === '!replay') {
       if (!serverQueue) {

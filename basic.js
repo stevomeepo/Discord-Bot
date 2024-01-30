@@ -62,8 +62,10 @@ const client = new Client({
   
       // Respond to Bot 1's messages
       if (message.author.id === '1195185960799977475') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
+        console.log(`Responding to message from Bot 1: ${message.content}`);
         const bot1Message = message.content;
         const response = await debate(bot1Message);
+        console.log(`Sending response: ${response}`);
         message.channel.send(response);
       }
     } catch (error) {

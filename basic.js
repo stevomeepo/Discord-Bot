@@ -57,16 +57,19 @@ const client = new Client({
   const debateChannelId = '1201747136182755398';
 
   client.on('messageCreate', async message => {
-
-    if (message.author.bot || message.channel.id !== debateChannelId) return;
-
-    // Respond to Bot 1's messages
-    if (message.author.id === '1195185960799977475') {
-      const bot1Message = message.content;
-      const response = await debate(bot1Message);
-      message.channel.send(response);
+    try {
+      if (message.author.bot || message.channel.id !== debateChannelId) return;
+  
+      // Respond to Bot 1's messages
+      if (message.author.id === 'BOT_1_ID') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
+        const bot1Message = message.content;
+        const response = await debate(bot1Message);
+        message.channel.send(response);
+      }
+    } catch (error) {
+      console.error('Error in messageCreate event:', error);
     }
-    
+
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
     if (bogaRegex.test(contentLower)) {

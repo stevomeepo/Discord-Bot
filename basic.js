@@ -57,6 +57,16 @@ const client = new Client({
   const debateChannelId = '1201747136182755398';
 
   client.on('messageCreate', async message => {
+
+    if (message.author.bot || message.channel.id !== debateChannelId) return;
+
+    // Respond to Bot 1's messages
+    if (message.author.id === '1195185960799977475') {
+      const bot1Message = message.content;
+      const response = await debate(bot1Message);
+      message.channel.send(response);
+    }
+    
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
     if (bogaRegex.test(contentLower)) {
@@ -87,15 +97,6 @@ const client = new Client({
         message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     } else if (tiltRegex.test(contentLower)) {
         message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
-    }
-
-    if (contentLower.startsWith('!debate')) {
-      if (message.channel.id !== debateChannelId) {
-        return;
-      }
-      const argument = message.content.slice('!debate'.length).trim();
-      const response = await debate(argument);
-      message.channel.send(response);
     }
 });
 

@@ -52,12 +52,24 @@ client.on('messageCreate', async message => {
 
   const debateChannelId = '1201747136182755398';
 
-  if (message.channel.id === debateChannelId && message.content.toLowerCase().startsWith('!debate')) {
-    const argument = message.content.slice('!debate'.length).trim();
-    const response = await debate(argument);
-    message.channel.send(response);
-  }
+  if (message.author.id === client.user.id) return;
+
+  // Check if the message is in the debate channel
+  if (message.channel.id === debateChannelId) {
+    // If a user starts the debate with a topic
+    if (!message.author.bot && message.content.toLowerCase().startsWith('!debate ')) {
+      const topic = message.content.slice('!debate '.length).trim();
+      const response = await debate(topic);
+      message.channel.send(response);
+    }
   
+    // If Bot 2 sends a message, Bot 1 responds
+    if (message.author.id === '1201636915443679382') {
+      const bot2Message = message.content;
+      const response = await debate(bot2Message);
+      message.channel.send(response);
+    }
+  }
   const chatChannelId = '1200653582584778772';
 
   if (message.channel.id === chatChannelId && !message.content.toLowerCase().startsWith('!chat') && message.author.id !== client.user.id) {

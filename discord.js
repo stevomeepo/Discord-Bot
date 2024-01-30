@@ -73,7 +73,13 @@ client.on('messageCreate', async message => {
   
   const musicCommandsChannelId = '1199841447579500564';
   if (message.channel.id === musicCommandsChannelId) {
-    setTimeout(() => message.delete().catch(console.error), 1000);
+    if (message.content.startsWith('Current queue:')) {
+      // If it's a queue message, delete it after 10 seconds
+      setTimeout(() => message.delete().catch(console.error), 10000);
+    } else {
+      // If it's not a queue message, delete it after 1 second
+      setTimeout(() => message.delete().catch(console.error), 1000);
+    }
   }
 
   if (message.content.startsWith('!') && message.author.id !== client.user.id) {

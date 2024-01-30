@@ -34,7 +34,15 @@ client.on('messageCreate', async message => {
 
   if (message.channel.id === chatChannelId && message.content.toLowerCase().startsWith('!chat')) {
     const chatMessage = message.content.slice('!chat'.length).trim();
-  
+    let typingMessage;
+
+    // Send a "Typing..." message if the response takes more than 5 seconds
+    const typingTimeout = setTimeout(() => {
+      message.channel.send("Typing...").then(sentMsg => {
+        typingMessage = sentMsg; // Assign the message once it's sent
+      });
+    }, 5000);
+
     try {
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: "gpt-4-0613",
@@ -48,10 +56,15 @@ client.on('messageCreate', async message => {
           'Content-Type': 'application/json'
         }
       });
-  
-      const sentMessage = await message.channel.send(response.data.choices[0].message.content);
-      // setTimeout(() => sentMessage.delete().catch(console.error), 3 * 60 * 60 * 1000);
-      // setTimeout(() => message.delete().catch(console.error), 3 * 60 * 60 * 1000);
+
+      // Clear the typing timeout and delete the "Typing..." message if it was sent
+      clearTimeout(typingTimeout);
+      if (typingMessage) {
+        typingMessage.delete().catch(console.error);
+      }
+
+      // Send the actual response from OpenAI
+      await message.channel.send(response.data.choices[0].message.content);
     } catch (error) {
       console.error('Error getting response from OpenAI:', error);
       message.channel.send('Sorry, I encountered an error trying to respond to your message.');

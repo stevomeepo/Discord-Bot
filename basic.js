@@ -61,7 +61,7 @@ const client = new Client({
       if (message.author.bot || message.channel.id !== debateChannelId) return;
   
       // Respond to Bot 1's messages
-      if (message.author.id === 'BOT_1_ID') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
+      if (message.author.id === '1195185960799977475') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
         const bot1Message = message.content;
         const response = await debate(bot1Message);
         message.channel.send(response);

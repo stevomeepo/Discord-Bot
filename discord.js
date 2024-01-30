@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const Connect4 = require('./connect4');
 const axios = require('axios');
 const { OpenAI } = require('openai');
 const queues = new Map();
@@ -12,7 +13,9 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildVoiceStates
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageReactionAdd,
+    GatewayIntentBits.MessageReactionRemove
   ]
 });
 const openai = new OpenAI({
@@ -26,6 +29,32 @@ client.on('ready', () => {
 let player;
 
 client.on('messageCreate', async message => {
+
+  if (message.content === '!connect4' && message.channel.id === '1201997710547230730') {
+    const game = new Connect4();
+    const gameMessage = await message.channel.send(game.toString());
+    for (let i = 1; i <= 7; i++) {
+      await gameMessage.react(i + '\u20E3');
+    }
+    const filter = (reaction, user) => user.id !== client.user.id && [1, 2, 3, 4, 5, 6, 7].includes(reaction.emoji.name[0]);
+    const collector = gameMessage.createReactionCollector({ filter });
+    collector.on('collect', (reaction, user) => {
+      const col = reaction.emoji.name[0] - 1;
+      if (game.hasSpace(col)) {
+        game.addPiece(col);
+        const winner = game.checkWin();
+        if (winner) {
+          collector.stop();
+          gameMessage.edit(game.toString() + `\nPlayer ${winner} wins!`);
+        } else {
+          game.switchPlayer();
+          gameMessage.edit(game.toString());
+        }
+      }
+      reaction.users.remove(user.id);
+    });
+  }
+
   const chatChannelId = '1200653582584778772';
 
   if (message.channel.id === chatChannelId && !message.content.toLowerCase().startsWith('!chat') && message.author.id !== client.user.id) {

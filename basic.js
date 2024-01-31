@@ -54,27 +54,32 @@ const client = new Client({
     console.log(`Logged in as ${client.user.tag}!`);
   });
 
-  const debateChannelId = '1201747136182755398';
-
   client.on('messageCreate', async message => {
+    const debateChannelId = '1201747136182755398';
 
+    // Ignore messages from the bot itself and non-debate channel messages
     if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
-
+  
+    // Ignore "Thinking..." messages to prevent responding to itself
     if (message.content === "Thinking...") return;
-
+  
     // Check if the message is from the debate channel
-  if (message.author.id === '1195185960799977475') { // Replace '1195185960799977475' with the actual ID of Bot 1
-    console.log(`Message from Bot 1 received: ${message.content}`);
-    // Send "Thinking..." message
-    message.channel.send("Thinking...");
-
-    // Delay the response by 5 seconds (5000 milliseconds)
-    setTimeout(async () => {
-      // Process the message from Bot 1
-      const response = await debate(message.content);
-      message.channel.send(response).catch(console.error);
-    }, 5000);
-  }
+    if (message.author.id === '1195185960799977475') { // Replace '1195185960799977475' with the actual ID of Bot 1
+      console.log(`Message from Bot 1 received: ${message.content}`);
+  
+      // Send a "Thinking..." message
+      let thinkingMessage = await message.channel.send("Thinking...");
+  
+      try {
+        const response = await debate(message.content);
+        await thinkingMessage.delete(); // Delete the "Thinking..." message
+        await message.channel.send(response);
+      } catch (error) {
+        console.error('Error getting response from OpenAI:', error);
+        await thinkingMessage.delete(); // Ensure the "Thinking..." message is deleted even on error
+        await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
+      }
+    }
 
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();

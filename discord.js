@@ -54,35 +54,35 @@ client.on('messageCreate', async message => {
 
   if (message.author.id === client.user.id) return;
 
+  if (message.content === "Thinking...") return;
+
   // Check if the message is in the debate channel
-  if (message.channel.id === debateChannelId) {
-    // If a user starts the debate with a topic
-    if (!message.author.bot && message.content.toLowerCase().startsWith('!debate ')) {
+  if (message.channel.id === debateChannelId && !message.author.bot) {
+    if (message.content.toLowerCase().startsWith('!debate ')) {
       const topic = message.content.slice('!debate '.length).trim();
+      let thinkingMessage; // Define the variable in the correct scope
 
       // Send a "Thinking..." message if the response takes more than 2 seconds
       const thinkingTimeout = setTimeout(() => {
         message.channel.send("Thinking...").then(sentMsg => {
-          typingMessage = sentMsg; // Assign the message once it's sent
+          thinkingMessage = sentMsg; // Assign the message once it's sent
         });
       }, 2000);
 
-      const response = await debate(topic);
+      try {
+        const response = await debate(topic);
 
-      // Clear the thinking timeout and delete the "Thinking..." message if it was sent
-      clearTimeout(thinkingTimeout);
-      if (typingMessage) {
-        typingMessage.delete().catch(console.error);
+        // Clear the thinking timeout and delete the "Thinking..." message if it was sent
+        clearTimeout(thinkingTimeout);
+        if (thinkingMessage) {
+          thinkingMessage.delete().catch(console.error);
+        }
+
+        message.channel.send(response);
+      } catch (error) {
+        console.error('Error getting response from OpenAI:', error);
+        message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
       }
-
-      message.channel.send(response);
-    }
-  
-    // If Bot 2 sends a message, Bot 1 responds
-    if (message.author.id === '1201636915443679382') { // Replace with Bot 2's actual ID
-      const bot2Message = message.content;
-      const response = await debate(bot2Message);
-      message.channel.send(response);
     }
   }
   

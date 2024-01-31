@@ -59,19 +59,22 @@ const client = new Client({
   client.on('messageCreate', async message => {
 
     if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
-    
+
     if (message.content === "Thinking...") return;
 
     // Check if the message is from the debate channel
-    if (message.channel.id === debateChannelId) {
-      // Log specifically for messages from Bot 1
-      if (message.author.id === '1195185960799977475') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
-        console.log(`Message from Bot 1 received: ${message.content}`);
-        // Process the message from Bot 1
-        const response = await debate(message.content);
-        message.channel.send(response).catch(console.error);
-      }
-    }
+  if (message.author.id === '1195185960799977475') { // Replace '1195185960799977475' with the actual ID of Bot 1
+    console.log(`Message from Bot 1 received: ${message.content}`);
+    // Send "Thinking..." message
+    message.channel.send("Thinking...");
+
+    // Delay the response by 5 seconds (5000 milliseconds)
+    setTimeout(async () => {
+      // Process the message from Bot 1
+      const response = await debate(message.content);
+      message.channel.send(response).catch(console.error);
+    }, 5000);
+  }
 
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();

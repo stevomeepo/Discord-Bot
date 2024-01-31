@@ -60,7 +60,7 @@ client.on('messageCreate', async message => {
   if (message.channel.id === debateChannelId && !message.author.bot) {
     if (message.content.toLowerCase().startsWith('!debate ')) {
       const topic = message.content.slice('!debate '.length).trim();
-      let thinkingMessage; // Define the variable in the correct scope
+      let thinkingMessage; // Declare outside of setTimeout
 
       // Send a "Thinking..." message if the response takes more than 2 seconds
       const thinkingTimeout = setTimeout(() => {
@@ -75,13 +75,13 @@ client.on('messageCreate', async message => {
         // Clear the thinking timeout and delete the "Thinking..." message if it was sent
         clearTimeout(thinkingTimeout);
         if (thinkingMessage) {
-          thinkingMessage.delete().catch(console.error);
+          await thinkingMessage.delete();
         }
 
-        message.channel.send(response);
+        await message.channel.send(response);
       } catch (error) {
         console.error('Error getting response from OpenAI:', error);
-        message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
+        await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
       }
     }
   }

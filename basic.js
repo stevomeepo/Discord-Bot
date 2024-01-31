@@ -57,19 +57,17 @@ const client = new Client({
   const debateChannelId = '1201747136182755398';
 
   client.on('messageCreate', async message => {
-    try {
-      if (message.author.bot || message.channel.id !== debateChannelId) return;
-  
-      // Respond to Bot 1's messages
+    console.log(`Message received from ${message.author.tag}: ${message.content}`);
+
+    // Check if the message is from the debate channel
+    if (message.channel.id === debateChannelId) {
+      // Log specifically for messages from Bot 1
       if (message.author.id === '1195185960799977475') { // Replace 'BOT_1_ID' with the actual ID of Bot 1
-        console.log(`Responding to message from Bot 1: ${message.content}`);
-        const bot1Message = message.content;
-        const response = await debate(bot1Message);
-        console.log(`Sending response: ${response}`);
-        message.channel.send(response);
+        console.log(`Message from Bot 1 received: ${message.content}`);
+        // Process the message from Bot 1
+        const response = await debate(message.content);
+        message.channel.send(response).catch(console.error);
       }
-    } catch (error) {
-      console.error('Error in messageCreate event:', error);
     }
 
     if (message.author.bot) return;

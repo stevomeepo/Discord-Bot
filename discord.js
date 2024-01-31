@@ -51,43 +51,28 @@ let player;
 client.on('messageCreate', async message => {
 
   const debateChannelId = '1201747136182755398';
-  const bot2Id = '1201636915443679382';
+  // Ignore messages from the bot itself and non-debate channel messages
+  if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
 
-  if (message.author.id === client.user.id) return;
-
+  // Ignore "Thinking..." messages to prevent responding to itself
   if (message.content === "Thinking...") return;
 
-  // Check if the message is in the debate channel
-  if (message.channel.id === debateChannelId && message.author.id === bot2Id) {
-    console.log(`Message from Bot 2 received: ${message.content}`); 
-    if (message.content.toLowerCase().startsWith('!debate ')) {
-      const topic = message.content.slice('!debate '.length).trim();
-      let thinkingMessage; // Declare outside of setTimeout
+  // Respond to the !debate command
+  if (message.content.toLowerCase().startsWith('!debate ')) {
+    const topic = message.content.slice('!debate '.length).trim();
+    console.log(`Debate topic received: ${topic}`); // Log the topic for debugging
 
-      // Send a "Thinking..." message if the response takes more than 2 seconds
-      const thinkingTimeout = setTimeout(() => {
-        message.channel.send("Thinking...").then(sentMsg => {
-          thinkingMessage = sentMsg; // Assign the message once it's sent
-        });
-      }, 2000);
+    // Send a "Thinking..." message
+    let thinkingMessage = await message.channel.send("Thinking...");
 
-      try {
-        const response = await debate(topic);
-
-        // Clear the thinking timeout and delete the "Thinking..." message if it was sent
-        clearTimeout(thinkingTimeout);
-        if (thinkingMessage) {
-          await thinkingMessage.delete();
-        }
-
-        await message.channel.send(response);
-      } catch (error) {
-        console.error('Error getting response from OpenAI:', error);
-        if (thinkingMessage) {
-          await thinkingMessage.delete(); // Make sure to delete the "Thinking..." message even if there's an error
-        }
-        await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
-      }
+    try {
+      const response = await debate(topic);
+      await thinkingMessage.delete(); // Delete the "Thinking..." message
+      await message.channel.send(response);
+    } catch (error) {
+      console.error('Error getting response from OpenAI:', error);
+      await thinkingMessage.delete(); // Ensure the "Thinking..." message is deleted even on error
+      await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
     }
   }
   

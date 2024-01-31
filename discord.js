@@ -58,7 +58,8 @@ client.on('messageCreate', async message => {
   if (message.content === "Thinking...") return;
 
   // Check if the message is in the debate channel
-  if (message.channel.id === debateChannelId) {
+  if (message.channel.id === debateChannelId && message.author.id === bot2Id) {
+    console.log(`Message from Bot 2 received: ${message.content}`); 
     if (message.content.toLowerCase().startsWith('!debate ')) {
       const topic = message.content.slice('!debate '.length).trim();
       let thinkingMessage; // Declare outside of setTimeout
@@ -82,6 +83,9 @@ client.on('messageCreate', async message => {
         await message.channel.send(response);
       } catch (error) {
         console.error('Error getting response from OpenAI:', error);
+        if (thinkingMessage) {
+          await thinkingMessage.delete(); // Make sure to delete the "Thinking..." message even if there's an error
+        }
         await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
       }
     }

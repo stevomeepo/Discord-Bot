@@ -57,7 +57,10 @@ const client = new Client({
   const debateChannelId = '1201747136182755398';
 
   client.on('messageCreate', async message => {
-    console.log(`Message received from ${message.author.tag}: ${message.content}`);
+
+    if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
+    
+    if (message.content === "Thinking...") return;
 
     // Check if the message is from the debate channel
     if (message.channel.id === debateChannelId) {

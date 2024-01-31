@@ -51,22 +51,31 @@ let player;
 client.on('messageCreate', async message => {
 
   const debateChannelId = '1201747136182755398';
+  const bot2Id = '1201636915443679382';
   // Ignore messages from the bot itself and non-debate channel messages
   if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
 
   // Ignore "Thinking..." messages to prevent responding to itself
   if (message.content === "Thinking...") return;
 
-  // Respond to the !debate command
-  if (message.content.toLowerCase().startsWith('!debate ')) {
-    const topic = message.content.slice('!debate '.length).trim();
-    console.log(`Debate topic received: ${topic}`); // Log the topic for debugging
+  // Check if the message is from Bot 2
+  if (message.author.id === bot2Id) {
+    console.log(`Message from Bot 2 received: ${message.content}`); // Log the message from Bot 2
+  }
+
+  // Respond to the !debate command from users or any message from Bot 2
+  if (message.content.toLowerCase().startsWith('!debate ') || message.author.id === bot2Id) {
+    const argument = message.content.toLowerCase().startsWith('!debate ')
+      ? message.content.slice('!debate '.length).trim()
+      : message.content; // Use the message content directly if it's from Bot 2
+
+    console.log(`Received message for debate: ${argument}`); // Log the message for debugging
 
     // Send a "Thinking..." message
     let thinkingMessage = await message.channel.send("Thinking...");
 
     try {
-      const response = await debate(topic);
+      const response = await debate(argument);
       await thinkingMessage.delete(); // Delete the "Thinking..." message
       await message.channel.send(response);
     } catch (error) {

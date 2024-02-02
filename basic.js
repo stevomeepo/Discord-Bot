@@ -19,7 +19,7 @@ const winRegex = /d+u+b+/i;
 const winRegex2 = /w+i+n/i;
 const drakeRegex = /d+r+a+k+e/i;
 const tiltRegex = /t+i+l+t/i;
-const ayRegex = /+a+y+/i;
+const ayRegex = /a+y/i;
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 // async function debate(argument) {

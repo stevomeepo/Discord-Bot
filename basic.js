@@ -19,6 +19,8 @@ const winRegex = /d+u+b+/i;
 const winRegex2 = /w+i+n/i;
 const drakeRegex = /d+r+a+k+e/i;
 const tiltRegex = /t+i+l+t/i;
+const ayRegex = /+a+y+/i;
+const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 // async function debate(argument) {
 //   try {
@@ -103,7 +105,7 @@ const client = new Client({
       message.channel.send("Matt is my boss");
     } else if (poopRegex.test(contentLower)) {
       message.channel.send("ayooo let me join");
-    } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower)) {
+    } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower) || ayRegex.test(contentLower)) {
         message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     } else if (stopRegex.test(contentLower)) {
         message.channel.send("Don't stop WON'T STOP!");
@@ -111,6 +113,8 @@ const client = new Client({
         message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     } else if (tiltRegex.test(contentLower)) {
         message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
+    } else if (urlRegex.test(message.content)) {
+      message.channel.send("Ay you know DAMNNN well im about to watch that right now!")
     }
 });
 

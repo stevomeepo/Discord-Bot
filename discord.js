@@ -24,66 +24,66 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-async function debate(argument) {
-  try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-4-0613",
-      messages: [{
-        role: "user",
-        content: argument
-      }],
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
+// async function debate(argument) {
+//   try {
+//     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+//       model: "gpt-4-0613",
+//       messages: [{
+//         role: "user",
+//         content: argument
+//       }],
+//     }, {
+//       headers: {
+//         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+//         'Content-Type': 'application/json'
+//       }
+//     });
 
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error getting response from OpenAI:', error);
-    return 'Sorry, I encountered an error trying to respond to your argument.';
-  }
-}
+//     return response.data.choices[0].message.content;
+//   } catch (error) {
+//     console.error('Error getting response from OpenAI:', error);
+//     return 'Sorry, I encountered an error trying to respond to your argument.';
+//   }
+// }
 
 let player;
 
 client.on('messageCreate', async message => {
 
-  const debateChannelId = '1201747136182755398';
-  const bot2Id = '1201636915443679382';
-  // Ignore messages from the bot itself and non-debate channel messages
-  if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
+  // const debateChannelId = '1201747136182755398';
+  // const bot2Id = '1201636915443679382';
+  // // Ignore messages from the bot itself and non-debate channel messages
+  // if (message.author.id === client.user.id || message.channel.id !== debateChannelId) return;
 
-  // Ignore "Thinking..." messages to prevent responding to itself
-  if (message.content === "Thinking...") return;
+  // // Ignore "Thinking..." messages to prevent responding to itself
+  // if (message.content === "Thinking...") return;
 
-  // Check if the message is from Bot 2
-  if (message.author.id === bot2Id) {
-    console.log(`Message from Bot 2 received: ${message.content}`); // Log the message from Bot 2
-  }
+  // // Check if the message is from Bot 2
+  // if (message.author.id === bot2Id) {
+  //   console.log(`Message from Bot 2 received: ${message.content}`); // Log the message from Bot 2
+  // }
 
-  // Respond to the !debate command from users or any message from Bot 2
-  if (message.content.toLowerCase().startsWith('!debate ') || message.author.id === bot2Id) {
-    const argument = message.content.toLowerCase().startsWith('!debate ')
-      ? message.content.slice('!debate '.length).trim()
-      : message.content; // Use the message content directly if it's from Bot 2
+  // // Respond to the !debate command from users or any message from Bot 2
+  // if (message.content.toLowerCase().startsWith('!debate ') || message.author.id === bot2Id) {
+  //   const argument = message.content.toLowerCase().startsWith('!debate ')
+  //     ? message.content.slice('!debate '.length).trim()
+  //     : message.content; // Use the message content directly if it's from Bot 2
 
-    console.log(`Received message for debate: ${argument}`); // Log the message for debugging
+  //   console.log(`Received message for debate: ${argument}`); // Log the message for debugging
 
-    // Send a "Thinking..." message
-    let thinkingMessage = await message.channel.send("Thinking...");
+  //   // Send a "Thinking..." message
+  //   let thinkingMessage = await message.channel.send("Thinking...");
 
-    try {
-      const response = await debate(argument);
-      await thinkingMessage.delete(); // Delete the "Thinking..." message
-      await message.channel.send(response);
-    } catch (error) {
-      console.error('Error getting response from OpenAI:', error);
-      await thinkingMessage.delete(); // Ensure the "Thinking..." message is deleted even on error
-      await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
-    }
-  }
+  //   try {
+  //     const response = await debate(argument);
+  //     await thinkingMessage.delete(); // Delete the "Thinking..." message
+  //     await message.channel.send(response);
+  //   } catch (error) {
+  //     console.error('Error getting response from OpenAI:', error);
+  //     await thinkingMessage.delete(); // Ensure the "Thinking..." message is deleted even on error
+  //     await message.channel.send('Sorry, I encountered an error trying to respond to your argument.');
+  //   }
+  // }
   
   const chatChannelId = '1200653582584778772';
 

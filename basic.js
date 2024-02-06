@@ -22,27 +22,27 @@ const tiltRegex = /t+i+l+t/i;
 const ayRegex = /a+y/i;
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
-// async function debate(argument) {
-//   try {
-//     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-//       model: "gpt-4-0613",
-//       messages: [{
-//         role: "user",
-//         content: argument
-//       }],
-//     }, {
-//       headers: {
-//         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-//         'Content-Type': 'application/json'
-//       }
-//     });
+async function debate(argument) {
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-4-0613",
+      messages: [{
+        role: "user",
+        content: argument
+      }],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-//     return response.data.choices[0].message.content;
-//   } catch (error) {
-//     console.error('Error getting response from OpenAI:', error);
-//     return 'Sorry, I encountered an error trying to respond to your argument.';
-//   }
-// }
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error getting response from OpenAI:', error);
+    return 'Sorry, I encountered an error trying to respond to your argument.';
+  }
+}
 
 const client = new Client({
     intents: [

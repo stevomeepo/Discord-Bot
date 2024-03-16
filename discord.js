@@ -97,37 +97,34 @@ client.on('messageCreate', async message => {
 
     // Send a "Typing..." message if the response takes more than 5 seconds
     const typingTimeout = setTimeout(() => {
-      message.channel.send("Typing...").then(sentMsg => {
-        typingMessage = sentMsg; // Assign the message once it's sent
-      });
-    }, 500);
+        message.channel.send("Typing...").then(sentMsg => {
+            typingMessage = sentMsg; // Assign the message once it's sent
 
-    try {
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-        model: "gpt-4-0613",
-        messages: [{
-          role: "user",
-          content: chatMessage
-        }],
-      }, {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      // Clear the typing timeout and delete the "Typing..." message if it was sent
-      clearTimeout(typingTimeout);
-      if (typingMessage) {
-        typingMessage.delete().catch(console.error);
-      }
-
-      // Send the actual response from OpenAI
-      await message.channel.send(response.data.choices[0].message.content);
-    } catch (error) {
-      console.error('Error getting response from OpenAI:', error);
-      message.channel.send('Sorry, I encountered an error trying to respond to your message.');
-    }
+            // Now, move the OpenAI call inside this then block
+            axios.post('https://api.openai.com/v1/chat/completions', {
+                model: "gpt-4-0613",
+                messages: [{
+                    role: "user",
+                    content: chatMessage
+                }],
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                // Clear the typing timeout as we're already inside the delayed block
+                clearTimeout(typingTimeout);
+                // Delete the "Typing..." message
+                typingMessage.delete().catch(console.error);
+                // Send the actual response from OpenAI
+                message.channel.send(response.data.choices[0].message.content);
+            }).catch(error => {
+                console.error('Error getting response from OpenAI:', error);
+                message.channel.send('Sorry, I encountered an error trying to respond to your message.');
+            });
+        });
+    }, 5000); // Adjusted to 5000 to ensure "Typing..." message has a chance to be sent
   }
   
   const musicCommandsChannelId = '1199841447579500564';

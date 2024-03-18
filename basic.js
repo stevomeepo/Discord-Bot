@@ -20,6 +20,7 @@ const winRegex2 = /w+i+n/i;
 const drakeRegex = /d+r+a+k+e/i;
 const tiltRegex = /t+i+l+t/i;
 const ayRegex = /a+y/i;
+const sweetRegex = /s+w+e+e+t+/i;
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 // async function debate(argument) {
@@ -114,7 +115,9 @@ const client = new Client({
     } else if (tiltRegex.test(contentLower)) {
         message.channel.send("https://tenor.com/view/chipi-chipi-chapa-chapa-cat-gif-2724505493463639324");
     } else if (urlRegex.test(message.content)) {
-      message.channel.send("Ay you know DAMNNN well im about to watch that right now!")
+      message.channel.send("Ay you know DAMNNN well im about to watch that right now!");
+    } else if (sweetRegex.test(message.content)) {
+      message.channel.send("Sweet like me hehe XD");
     }
 });
 

@@ -21,6 +21,7 @@ const drakeRegex = /d+r+a+k+e/i;
 const tiltRegex = /t+i+l+t/i;
 const ayRegex = /a+y/i;
 const sweetRegex = /s+w+e+e+t+/i;
+const readyRegex = /r+e+a+d+y+/i;
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 // async function debate(argument) {
@@ -118,6 +119,8 @@ const client = new Client({
       message.channel.send("Ay you know DAMNNN well im about to watch that right now!");
     } else if (sweetRegex.test(message.content)) {
       message.channel.send("Sweet like me hehe XD");
+    } else if (readyRegex.test(message.content)) {
+      message.channel.send("Ready or not...here I come ;)");
     }
 });
 

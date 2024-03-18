@@ -24,6 +24,16 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isButton()) return;
+
+  const userId = interaction.user.id;
+  const userName = interaction.user.username;
+  const response = interaction.customId === 'yes' ? "is free to clash this weekend!" : "is not free to clash this weekend.";
+
+  await interaction.reply({ content: `${userName} ${response}`, ephemeral: true });
+});
+
 // async function debate(argument) {
 //   try {
 //     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -49,6 +59,23 @@ client.on('ready', () => {
 let player;
 
 client.on('messageCreate', async message => {
+  if (message.content.toLowerCase() === '!clash' && message.channel.id === '1219416503208906794') {
+    const yesButton = new discord.MessageButton()
+      .setCustomId('yes')
+      .setLabel('Yes')
+      .setStyle('SUCCESS');
+
+    const noButton = new discord.MessageButton()
+      .setCustomId('no')
+      .setLabel('No')
+      .setStyle('DANGER');
+
+    const row = new discord.MessageActionRow()
+      .addComponents(yesButton, noButton);
+
+    const clashMessage = "Who is free to clash this weekend?";
+    await message.channel.send({ content: clashMessage, components: [row] });
+  }
 
   // const debateChannelId = '1201747136182755398';
   // const bot2Id = '1201636915443679382';

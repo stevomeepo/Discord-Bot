@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const axios = require('axios');
@@ -15,6 +15,12 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates
   ]
 });
+
+const clashResponses = {
+  yes: new Set(),
+  no: new Set()
+};
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -29,9 +35,17 @@ client.on('interactionCreate', async interaction => {
 
   const userId = interaction.user.id;
   const userName = interaction.user.username;
-  const response = interaction.customId === 'yes' ? "is free to clash this weekend!" : "is not free to clash this weekend.";
 
-  await interaction.reply({ content: `${userName} ${response}`, ephemeral: true });
+  // Check which button was pressed and update the structure
+  if (interaction.customId === 'yes') {
+    clashResponses.yes.add(userName); // Add the user to the 'yes' set
+    clashResponses.no.delete(userName); // Ensure the user is not in the 'no' set
+  } else if (interaction.customId === 'no') {
+    clashResponses.no.add(userName); // Add the user to the 'no' set
+    clashResponses.yes.delete(userName); // Ensure the user is not in the 'yes' set
+  }
+
+  await interaction.reply({ content: `Thanks for responding, ${userName}!`, ephemeral: true });
 });
 
 // async function debate(argument) {
@@ -60,21 +74,25 @@ let player;
 
 client.on('messageCreate', async message => {
   if (message.content.toLowerCase() === '!clash' && message.channel.id === '1219416503208906794') {
-    const yesButton = new discord.MessageButton()
+    // Create the buttons for "Yes" and "No" responses
+    const yesButton = new ButtonBuilder()
       .setCustomId('yes')
       .setLabel('Yes')
-      .setStyle('SUCCESS');
+      .setStyle(ButtonStyle.Success);
 
-    const noButton = new discord.MessageButton()
+    const noButton = new ButtonBuilder()
       .setCustomId('no')
       .setLabel('No')
-      .setStyle('DANGER');
+      .setStyle(ButtonStyle.Danger);
 
-    const row = new discord.MessageActionRow()
-      .addComponents(yesButton, noButton);
+    // Create an action row to hold the buttons
+    const row = new ActionRowBuilder().addComponents(yesButton, noButton);
 
-    const clashMessage = "Who is free to clash this weekend?";
-    await message.channel.send({ content: clashMessage, components: [row] });
+    // Send the message with the buttons
+    await message.channel.send({
+      content: "Who is free to clash this weekend?",
+      components: [row]
+    });
   }
 
   // const debateChannelId = '1201747136182755398';

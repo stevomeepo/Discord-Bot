@@ -35,24 +35,24 @@ const client = new Client({
 
 const urlResponses = [
   "Ay you know DAMNNN well im about to watch that right now!",
-  "I'm not clicking that",
-  "Well well well, what do we have here.... "
+  "I'm not clicking that 🫨",
+  "Well well well, what do we have here.... 🤔"
 ];
 
 const stfuResponses = [
-  "Hey that's not very nice!",
-  "I'm just trying to help!",
-  "I'm sorry, I'll be quiet now...SIKE",
-  "Awww man.....",
-  "Don't do me like that!",
-  "I thought you are my friend :o"
+  "Hey that's not very nice! 😟",
+  "I'm just trying to help! 😔",
+  "I'm sorry, I'll be quiet now...SIKE 😂😂😂",
+  "Awww man.....😔",
+  "Don't do me like that😔!",
+  "I thought you are my friend 😔"
 ]
 
 const downResponses = [
-  "I'm acutally DOWNS",
-  "I'm down if you are down",
-  "I'm down for whatever!",
-  "hehehe downs time"
+  "I'm acutally DOWNS 🤪",
+  "I'm down if you are down 🤪",
+  "I'm down for whatever! 🤪",
+  "hehehe downs time! 🤪"
 ]
 
   client.on('ready', () => {
@@ -64,28 +64,28 @@ const downResponses = [
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
     if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
-      message.channel.send('Good night bogas!');
+      message.channel.send('Good night bogas! 😴');
     } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
-      message.channel.send("IT'S TIME TO COOK! @everyone");
+      message.channel.send("IT'S TIME TO COOK! 👨‍🍳 @everyone");
     } else if (goofyRegex.test(contentLower)) {
-      message.channel.send('Imma goofy goober!');
+      message.channel.send('Imma goofy goober! 🤪');
     } else if (dummyRegex.test(contentLower)) {
-      message.channel.send('thats me hehe XD');
+      message.channel.send('thats me hehe XD 😂');
     } else if (tickleRegex.test(contentLower)) {
-      message.channel.send("It's tickle tuesday!");
+      message.channel.send("It's tickle tuesday! 🤪");
     } else if (downRegex.test(contentLower)) {
       const randomDownResponses = downResponses[Math.floor(Math.random() * downResponses.length)]; 
       message.channel.send(randomDownResponses);
     } else if (lolRegex.test(contentLower) || (lmaoRegex.test(contentLower))) {
-      message.channel.send("stop making me laugh so hard teehee");
+      message.channel.send("stop making me laugh so hard teehee 🤪😂");
     } else if (mattRegex.test(contentLower)) {
       message.channel.send("Matt is my boss");
     } else if (poopRegex.test(contentLower)) {
-      message.channel.send("ayooo let me join");
+      message.channel.send("ayooo let me join 🤪");
     } else if (dance1Regex.test(contentLower) || dance2Regex.test(contentLower) || ayRegex.test(contentLower)) {
         message.channel.send("AYYYY AY AY AY https://giphy.com/gifs/skeleton-dancing-tellmeohtellme-THlB4bsoSA0Cc");
     } else if (stopRegex.test(contentLower)) {
-        message.channel.send("Don't stop WON'T STOP!");
+        message.channel.send("I WON'T STOP!");
     } else if (winRegex.test(contentLower) || winRegex2.test(contentLower) || drakeRegex.test(contentLower)) {
         message.channel.send("Anita Max Wynnnnn! https://giphy.com/gifs/Micropharms1-anitamaxxwynn-anita-max-wyn-drake-alter-ego-jSFfhtpHTpCkFrfYPN");
     } else if (tiltRegex.test(contentLower)) {

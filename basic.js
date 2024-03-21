@@ -63,9 +63,7 @@ const downResponses = [
 
     if (message.author.bot) return;
     const contentLower = message.content.toLowerCase();
-    if (bogaRegex.test(contentLower)) {
-      message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
-    } else if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
+    if (message.content.toLowerCase().includes('good night') || message.content.toLowerCase().includes('gn')) {
       message.channel.send('Good night bogas!');
     } else if (cookRegex.test(contentLower) || timeRegex.test(contentLower)) {
       message.channel.send("IT'S TIME TO COOK! @everyone");
@@ -102,6 +100,8 @@ const downResponses = [
     } else if (stfuRegex.test(message.content)) {
       const randomStfuResponses = stfuResponses[Math.floor(Math.random() * stfuResponses.length)];
       message.channel.send(randomStfuResponses);
+    } else if (bogaRegex.test(contentLower)) {
+      message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
     }
 });
 

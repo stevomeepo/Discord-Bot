@@ -44,7 +44,7 @@ const stfuResponses = [
   "I'm just trying to help! 😔",
   "I'm sorry, I'll be quiet now...SIKE 😂😂😂",
   "Awww man.....😔",
-  "Don't do me like that😔!",
+  "Don't do me like that! 😔",
   "I thought you are my friend 😔"
 ]
 

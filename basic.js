@@ -23,6 +23,7 @@ const ayRegex = /a+y/i;
 const sweetRegex = /s+w+e+e+t+/i;
 const stfuRegex = /s+t+f+u+/i;
 const readyRegex = /r+e+a+d+y+/i;
+const joshRegex = /j+o+s+h+/i;
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 const client = new Client({
@@ -102,6 +103,8 @@ const downResponses = [
       message.channel.send(randomStfuResponses);
     } else if (bogaRegex.test(contentLower)) {
       message.channel.send('Hello boga! I AM THE BOGA BOGA BOGA MONSTER');
+    } else if (joshRegex.test(contentLower)) {
+      message.channel.send('@joshc_zhao');
     }
 });
 
